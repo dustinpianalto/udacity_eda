@@ -6,13 +6,15 @@ Lesson 3
 ### What to Do First?
 Notes:
 
-***
+Read in Pseudo Facebook data.
+
 
 ### Pseudo-Facebook User Data
 Notes:
 
 ```{r Pseudo-Facebook User Data}
-
+pf <- read.csv('pseudo_facebook.tsv', sep='\t')
+names(pf)
 ```
 
 ***
@@ -21,8 +23,11 @@ Notes:
 Notes:
 
 ```{r Histogram of Users\' Birthdays}
-install.packages('ggplot2')
+# install.packages('ggplot2')
 library(ggplot2)
+
+qplot(x=dob_day, data=pf, binwidth = 1) +
+  scale_x_continuous(breaks = 1:31)
 ```
 
 ***
@@ -30,17 +35,16 @@ library(ggplot2)
 #### What are some things that you notice about this histogram?
 Response:
 
-***
+Day 1 and day 31
 
 ### Moira's Investigation
 Notes:
 
-***
+Moira is looking at how people estimate their audience size.
 
 ### Estimating Your Audience Size
 Notes:
 
-***
 
 #### Think about a time when you posted a specific message or shared a photo on Facebook. What was it?
 Response:
@@ -51,7 +55,7 @@ Response:
 #### Think about what percent of your friends on Facebook see any posts or comments that you make in a month. What percent do you think that is?
 Response:
 
-***
+about 10%
 
 ### Perceived Audience Size
 Notes:
@@ -61,25 +65,27 @@ Notes:
 Notes:
 
 ```{r Faceting}
-
+qplot(x=dob_day, data=pf, binwidth = 1) +
+  scale_x_continuous(breaks = 1:31) +
+  facet_wrap(~dob_month, ncol=3)
 ```
 
 #### Let’s take another look at our plot. What stands out to you here?
 Response:
 
-***
+Most of the 1st birthdays are in Janually, probably from FBs default or choosing the first option on the list.
 
 ### Be Skeptical - Outliers and Anomalies
 Notes:
 
-***
+Some outliers are extreme examples, but other times they show bad data or errors in collection
 
 ### Moira's Outlier
 Notes:
 #### Which case do you think applies to Moira’s outlier?
 Response:
 
-***
+Bad data about an extreme case.
 
 ### Friend Count
 Notes:
@@ -87,25 +93,25 @@ Notes:
 #### What code would you enter to create a histogram of friend counts?
 
 ```{r Friend Count}
-
+qplot(x=friend_count, data=pf, binwidth = 1)
 ```
 
 #### How is this plot similar to Moira's first plot?
 Response:
 
-***
+Massive spike at low values and the scale on the axes is not very helpful.
 
 ### Limiting the Axes
 Notes:
 
 ```{r Limiting the Axes}
-
+qplot(x=friend_count, data=pf, binwidth = 1, xlim=c(0,1000))
 ```
 
 ### Exploring with Bin Width
 Notes:
 
-***
+Lower binwidth gives more precise info but can become cluttered.
 
 ### Adjusting the Bin Width
 Notes:
@@ -116,7 +122,8 @@ Notes:
 # Add it to the code below.
 qplot(x = friend_count, data = pf, binwidth = 10) +
   scale_x_continuous(limits = c(0, 1000),
-                     breaks = seq(0, 1000, 50))
+                     breaks = seq(0, 1000, 50)) +
+  facet_wrap(~gender)
 ```
 
 ***
@@ -125,34 +132,43 @@ qplot(x = friend_count, data = pf, binwidth = 10) +
 Notes:
 
 ```{r Omitting NA Values}
-
+qplot(x = friend_count, data = pf[!is.na(pf$gender),], binwidth = 10) +
+  scale_x_continuous(limits = c(0, 1000),
+                     breaks = seq(0, 1000, 50)) +
+  facet_wrap(~gender)
 ```
 
-***
+Can use na.omit but be careful because that will omit rows that have na in other values too.
 
 ### Statistics 'by' Gender
 Notes:
 
 ```{r Statistics \'by\' Gender}
-
+table(pf$gender)
+by(pf$friend_count, pf$gender, summary)
 ```
 
 #### Who on average has more friends: men or women?
 Response:
 
+Women
+
 #### What's the difference between the median friend count for women and men?
 Response:
+
+22
 
 #### Why would the median be a better measure than the mean?
 Response:
 
-***
+Because it is the middle number in the dataset and is not as influenced by the extreme outliers.
 
 ### Tenure
 Notes:
 
 ```{r Tenure}
-
+qplot(x = tenure, data = pf, binwidth=30,
+      color = I('black'), fill= I('#099DD9'))
 ```
 
 ***
@@ -160,7 +176,9 @@ Notes:
 #### How would you create a histogram of tenure by year?
 
 ```{r Tenure Histogram by Year}
-
+qplot(x = tenure / 365, data = pf, binwidth=0.25,
+      color = I('black'), fill= I('#099DD9')) +
+  scale_x_continuous(breaks = c(0:8))
 ```
 
 ***
@@ -169,7 +187,11 @@ Notes:
 Notes:
 
 ```{r Labeling Plots}
-
+qplot(x = tenure / 365, data = pf, binwidth=0.25,
+      color = I('black'), fill= I('#099DD9')) +
+  scale_x_continuous(breaks = c(0:8), lim = c(0,7)) +
+  xlab('Number of yeas using Facebook') +
+  ylab('Number of users in sample')
 ```
 
 ***
@@ -178,34 +200,40 @@ Notes:
 Notes:
 
 ```{r User Ages}
-
+qplot(x = age, data = pf, binwidth=1,
+      color = I('black'), fill= I('#099DD9')) +
+  scale_x_continuous(breaks = seq(0,115,5), lim = c(12,115)) +
+  xlab('Ages of Facebook Users') +
+  ylab('Number of users in sample')
 ```
 
 #### What do you notice?
 Response:
 
-***
+There are an abnormal amount of users over 100 years old...
 
 ### The Spread of Memes
 Notes:
 
-***
+Get the min max from the data with summary(pf$age)
 
 ### Lada's Money Bag Meme
 Notes:
 
-***
+Memes tend to reaccure.
+Log scale instead of linear can show low numbers
 
 ### Transforming Data
 Notes:
 
-***
+Engagement variables are often long tailed (over dispersed)
+log10(variable) with show -Inf for undefined variables such as 0
 
 ### Add a Scaling Layer
 Notes:
 
 ```{r Add a Scaling Layer}
-
+qplot(x = log10(friend_count + 1), data = pf)
 ```
 
 ***
