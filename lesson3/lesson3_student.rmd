@@ -233,7 +233,17 @@ log10(variable) with show -Inf for undefined variables such as 0
 Notes:
 
 ```{r Add a Scaling Layer}
-qplot(x = log10(friend_count + 1), data = pf)
+library(gridExtra)
+g1 <- ggplot(aes(x = friend_count), data = pf) +
+  geom_histogram(binwidth = 1) +
+  scale_x_sqrt(breaks = seq(0, 1500, 50), limits = c(0, 1500))
+g2 <- ggplot(aes(x = friend_count), data = pf) +
+  geom_histogram(binwidth = 0.1) +
+  scale_x_log10(breaks = seq(0, 1500, 50), limits = c(1, 1500))
+g3 <- ggplot(aes(x = friend_count), data = pf) +
+  geom_histogram(binwidth = 1) +
+  scale_x_continuous(breaks = seq(0, 1500, 50), limits= c(1, 1500))
+grid.arrange(g3, g2, g1)
 ```
 
 ***
@@ -242,7 +252,12 @@ qplot(x = log10(friend_count + 1), data = pf)
 ### Frequency Polygons
 
 ```{r Frequency Polygons}
-
+ggplot(aes(x = friend_count, y = ..count../sum(..count..),  color = gender),
+       data = subset(pf, !is.na(gender))) +
+  labs(x = "Friend Count",
+       y = "Proportion of Users with that friend count") +
+  geom_freqpoly(binwidth = 50) +
+  scale_x_continuous(lim = c(1000, 5000), breaks = seq(0, 1000, 50))
 ```
 
 ***
@@ -251,7 +266,15 @@ qplot(x = log10(friend_count + 1), data = pf)
 Notes:
 
 ```{r Likes on the Web}
+ggplot(aes(x = www_likes, y = ..count../sum(..count..),  color = gender),
+       data = subset(pf, !is.na(gender))) +
+  labs(x = "Friend Count",
+       y = "Proportion of Users with that friend count") +
+  geom_freqpoly(binwidth = 0.1) +
+  scale_x_continuous() +#lim = c(0, 8000), breaks = seq(3000, 8000, 50)) +
+  scale_x_log10()
 
+by(pf$www_likes, pf$gender, sum)
 ```
 
 
@@ -261,22 +284,38 @@ Notes:
 Notes:
 
 ```{r Box Plots}
-
+ggplot(aes(x = gender, y = friend_count,  color = gender),
+       data = subset(pf, !is.na(gender))) +
+  labs(y = "Friend Count") +
+  geom_boxplot()
 ```
+
 
 #### Adjust the code to focus on users who have friend counts between 0 and 1000.
 
 ```{r}
-
+ggplot(aes(x = gender, y = friend_count,  color = gender),
+       data = subset(pf, !is.na(gender))) +
+  labs(y = "Friend Count") +
+  geom_boxplot() +
+  coord_cartesian(ylim = c(0, 1000))
 ```
 
-***
+coord_cartesian is better because scale_y_continuous removes datapoints. coord_cartesian just changes the coordinate system.
+
+Black line is Median
 
 ### Box Plots, Quartiles, and Friendships
 Notes:
 
 ```{r Box Plots, Quartiles, and Friendships}
+ggplot(aes(x = gender, y = friend_count,  color = gender),
+       data = subset(pf, !is.na(gender))) +
+  labs(y = "Friend Count") +
+  geom_boxplot() +
+  coord_cartesian(ylim = c(0, 250))
 
+by(pf$friend_count, pf$gender, summary)
 ```
 
 #### On average, who initiated more friendships in our sample: men or women?
@@ -284,7 +323,13 @@ Response:
 #### Write about some ways that you can verify your answer.
 Response:
 ```{r Friend Requests by Gender}
+ggplot(aes(x = gender, y = friendships_initiated,  color = gender),
+       data = subset(pf, !is.na(gender))) +
+  labs(y = "Friend Count") +
+  geom_boxplot() +
+  coord_cartesian(ylim = c(0, 150))
 
+by(pf$friendships_initiated, pf$gender, summary)
 ```
 
 Response:
@@ -295,6 +340,15 @@ Response:
 Notes:
 
 ```{r Getting Logical}
+summary(pf$mobile_likes)
+
+summary(pf$mobile_likes > 0)
+
+pf$mobile_check_in <- NA
+pf$mobile_check_in <- ifelse(pf$mobile_likes > 0, 1, 0)
+#pf$mobile_check_in <- factor(pf$mobile_check_in)
+summary(pf$mobile_check_in)
+sum(pf$mobile_check_in)/length(pf$mobile_check_in)
 
 ```
 
@@ -305,7 +359,7 @@ Response:
 ### Analyzing One Variable
 Reflection:
 
-***
+I learned that often you need to transform the dataset to show meaningful information. Also with data that has long tails it is usually better to use the Median instead of the Mean. Also learned several new ways of visualizing the data and how to modify the graphs to take a closer look at certain parts of the data.
 
 Click **KnitHTML** to see all of your hard work and to have an html
 page of this lesson, your answers, and your notes!
