@@ -73,7 +73,7 @@ qplot(x=dob_day, data=pf, binwidth = 1) +
 #### Let’s take another look at our plot. What stands out to you here?
 Response:
 
-Most of the 1st birthdays are in Janually, probably from FBs default or choosing the first option on the list.
+Most of the 1st birthdays are in January, probably from FBs default or choosing the first option on the list.
 
 ### Be Skeptical - Outliers and Anomalies
 Notes:
@@ -220,7 +220,7 @@ Get the min max from the data with summary(pf$age)
 ### Lada's Money Bag Meme
 Notes:
 
-Memes tend to reaccure.
+Memes tend to reoccur.
 Log scale instead of linear can show low numbers
 
 ### Transforming Data
