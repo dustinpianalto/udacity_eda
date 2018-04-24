@@ -153,13 +153,32 @@ g6 <- ggplot(aes(factor(year), cases, group = 1), data = subset(b_2000, Total.fe
        y = "Births per Woman") +
   ggtitle('Canada') +
   coord_cartesian(ylim = c(1.5, 8)) +
-  scale_x_discrete()
+  scale_x_discrete(breaks = NULL)
 grid.arrange(g1, g2, g3, g4, g5, g6)
 ```
 
+```{r fertility}
+births <- read.csv('total_fertility.csv')
+library(tidyr)
+library(gridExtra)
+b_2000 <- gather(births, 'X1920':'X2000', key = 'year', value = 'cases')
 
+p1 = ggplot(aes(x = year, y = cases, group = 1), data = subset(b_2000, Total.fertility.rate == 'United States')) +
+  geom_line() +
+  labs(x = "Year",
+       y = "Births per Woman") +
+  ggtitle('United States') +
+  theme(axis.text.x= element_text(size = 6, angle = 90))
 
-
+p2 = ggplot(aes(x = year, y = factor(cases), group = 1), data = subset(b_2000, Total.fertility.rate == 'United States')) +
+  geom_histogram(stat = 'identity') +
+  labs(x = "Year",
+       y = "Births per Woman") +
+  ggtitle('United States') +
+  scale_y_discrete(breaks = seq(1, 5, .1)) +
+  theme(axis.text.x= element_text(size = 6, angle = 90))
+grid.arrange(p1, p2)
+```
 
 
 

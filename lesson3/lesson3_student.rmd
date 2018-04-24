@@ -190,7 +190,7 @@ Notes:
 qplot(x = tenure / 365, data = pf, binwidth=0.25,
       color = I('black'), fill= I('#099DD9')) +
   scale_x_continuous(breaks = c(0:8), lim = c(0,7)) +
-  xlab('Number of yeas using Facebook') +
+  xlab('Number of years using Facebook') +
   ylab('Number of users in sample')
 ```
 
