@@ -111,75 +111,147 @@ table(diamonds$carat)
 births <- read.csv('total_fertility.csv')
 library(tidyr)
 library(gridExtra)
-b_2000 <- gather(births, -Total.fertility.rate, key = 'year', value = 'cases')
-g1 <- ggplot(aes(x = year, y = cases, group = 1), data = subset(b_2000, Total.fertility.rate == 'United States')) +
-  geom_line() +
-  labs(x = "Year",
-       y = "Births per Woman") +
-  ggtitle('United States') +
-  coord_cartesian(ylim = c(1.5, 8)) +
-  scale_x_discrete(breaks = NULL)
-g2 <- ggplot(aes(x = year, y = cases, group = 1), data = subset(b_2000, Total.fertility.rate == 'Germany')) +
-  geom_line() +
-  labs(x = "Year",
-       y = "Births per Woman") +
-  ggtitle('Germany') +
-  coord_cartesian(ylim = c(1.5, 8)) +
-  scale_x_discrete(breaks = NULL)
-g3 <- ggplot(aes(x = year, y = cases, group = 1), data = subset(b_2000, Total.fertility.rate == 'United Kingdom')) +
-  geom_line() +
-  labs(x = "Year",
-       y = "Births per Woman") +
-  ggtitle('United Kingdom') +
-  coord_cartesian(ylim = c(1.5, 8)) +
-  scale_x_discrete(breaks = NULL)
-g4 <- ggplot(aes(x = year, y = cases, group = 1), data = subset(b_2000, Total.fertility.rate == 'Spain')) +
-  geom_line() +
-  labs(x = "Year",
-       y = "Births per Woman") +
-  ggtitle('Spain') +
-  coord_cartesian(ylim = c(1.5, 8)) +
-  scale_x_discrete(breaks = NULL)
-g5 <- ggplot(aes(x = year, y = cases, group = 1), data = subset(b_2000, Total.fertility.rate == 'France')) +
-  geom_line() +
-  labs(x = "Year",
-       y = "Births per Woman") +
-  ggtitle('France') +
-  coord_cartesian(ylim = c(1.5, 8)) +
-  scale_x_discrete(breaks = NULL)
-g6 <- ggplot(aes(factor(year), cases, group = 1), data = subset(b_2000, Total.fertility.rate == 'Canada')) +
-  geom_line() +
-  labs(x = "Year",
-       y = "Births per Woman") +
-  ggtitle('Canada') +
-  coord_cartesian(ylim = c(1.5, 8)) +
-  scale_x_discrete(breaks = NULL)
-grid.arrange(g1, g2, g3, g4, g5, g6)
+births <- t(births)
+
+ggplot(aes(x = 'United States'), data = births)
 ```
 
 ```{r fertility}
 births <- read.csv('total_fertility.csv')
 library(tidyr)
 library(gridExtra)
-b_2000 <- gather(births, 'X1920':'X2000', key = 'year', value = 'cases')
+#b_2000 <- gather(births, 'X1920':'X2000', key = 'year', value = 'cases')
+b_2000 <- gather(births, -Total.fertility.rate, key = 'year', value = 'cases')
 
-p1 = ggplot(aes(x = year, y = cases, group = 1), data = subset(b_2000, Total.fertility.rate == 'United States')) +
-  geom_line() +
-  labs(x = "Year",
-       y = "Births per Woman") +
+data = subset(b_2000, Total.fertility.rate == 'United States')
+
+p1 = ggplot(aes(x = cases, group = 1), data = subset(b_2000, Total.fertility.rate == 'United States')) +
+  geom_histogram(binwidth = 0.1) +
+  labs(y = "Years",
+       x = "Births per Woman") +
   ggtitle('United States') +
   theme(axis.text.x= element_text(size = 6, angle = 90))
 
-p2 = ggplot(aes(x = year, y = factor(cases), group = 1), data = subset(b_2000, Total.fertility.rate == 'United States')) +
-  geom_histogram(stat = 'identity') +
-  labs(x = "Year",
-       y = "Births per Woman") +
-  ggtitle('United States') +
+p2 = ggplot(aes(x = cases, group = 1), data = subset(b_2000, Total.fertility.rate == 'United Kingdom')) +
+  geom_histogram(binwidth = 0.1) +
+  labs(y = "Years",
+       x = "Births per Woman") +
+  ggtitle('United Kingdom')
   scale_y_discrete(breaks = seq(1, 5, .1)) +
   theme(axis.text.x= element_text(size = 6, angle = 90))
-grid.arrange(p1, p2)
+
+p3 = ggplot(aes(x = cases, group = 1), data = subset(b_2000, Total.fertility.rate == 'Brazil')) +
+  geom_histogram(binwidth = 0.1) +
+  labs(y = "Years",
+       x = "Births per Woman") +
+  ggtitle('Brazil')
+  scale_y_discrete(breaks = seq(1, 5, .1)) +
+  theme(axis.text.x= element_text(size = 6, angle = 90))
+
+p4 = ggplot(aes(x = cases, group = 1), data = subset(b_2000, Total.fertility.rate == 'India')) +
+  geom_histogram(binwidth = 0.1) +
+  labs(y = "Years",
+       x = "Births per Woman") +
+  ggtitle('India')
+  scale_y_discrete(breaks = seq(1, 5, .1)) +
+  theme(axis.text.x= element_text(size = 6, angle = 90))
+
+p5 = ggplot(aes(x = cases, group = 1), data = b_2000) +
+  geom_histogram(binwidth = 0.1) +
+  labs(y = "Years",
+       x = "Births per Woman") +
+  ggtitle('Global') +
+  scale_x_continuous(breaks = seq(0.0, 9.3, 1))
+
+p1 = ggplot(aes(x = cases, group = 1), data = subset(b_2000, Total.fertility.rate == 'United States')) +
+  geom_histogram(binwidth = 0.1) +
+  labs(y = "Years",
+       x = "Births per Woman") +
+  ggtitle('United States') +
+  theme(axis.text.x= element_text(size = 6, angle = 90))
+
+grid.arrange(p1, p2, p3, p4, p5, ncol = 2)
+
+summary(data['cases'])
+summary(b_2000['cases'])
 ```
 
 
+The data I chose was the number of births per woman by country and year. From the Graphs it looks like
+the more third world or developing countries have a higher birth rate than first world countries such as
+the US and UK. If you graph the data using the year as the x axis and the number of births as the y axis
+it becomes apparent that in countries such as Brazil and India which are developing countries the birth
+rate has dropped drastically in the last couple decades as they are becoming more advanced.
 
+Here are some basic statistics for the global data as well as the US
 
+  US                 Global      
+Min.   :1.740     Min.   :0.840  
+1st Qu.:2.308     1st Qu.:4.620  
+Median :3.700     Median :5.900  
+Mean   :4.033     Mean   :5.397 
+3rd Qu.:5.562     3rd Qu.:6.580  
+Max.   :7.030     Max.   :9.220  
+                  NA's   :12532 
+
+```{r birthdays}
+library(lubridate)
+library(gridExtra)
+
+# Import Sample Birthdays data
+birthdays <- read.csv('birthdaysExample.csv')
+
+# Convert the data frame into datetime objects sorted by date
+dates <- strptime(birthdays$dates[order(as.Date(birthdays$dates, format = '%m/%d/%y'))], '%m/%d/%y')
+
+# Create a histogram showing the amount of birthdays for every day in the dataset
+p1 = ggplot(birthdays, aes(x = dates)) +
+  geom_histogram(stat='count', binwidth = 1)
+
+# Extract the Months and Days from the dates into new columns
+birthdays$months <- month(dates)
+birthdays$days <- day(dates)
+
+# Create a histogram showing the distribution of birthdays by month
+p2 <- ggplot(birthdays, aes(months)) +
+  geom_histogram() +
+  scale_x_continuous(breaks = seq(1, 12, 1))
+
+# Create a historgram showing the distribution of birthdays by day of the month.
+p3 <- ggplot(birthdays, aes(days)) +
+  geom_histogram() +
+  scale_x_continuous(breaks = seq(1, 31, 1))
+
+# Show all 3 histograms on the same image
+grid.arrange(p1, p2, p3)
+
+# Show basic statistics of the data including the Quartiles, Min, Max, Mean, and Median
+summary(birthdays)
+
+```
+
+From this we can see that the days that have the most births
+are Feb 6th,May 22nd, and July 16th with 8 people each. But
+as we can tell from the other distributions the number of
+birthdays per month is fairly even. The mean is 6.474 which
+is very close to half way through they year. The Median is
+slightly higher at 7 which indicates that there are slightly
+more birthdays in the latter half of the year. The quartiles
+also indicate an even distribution with the 25% quartile at
+month 3 and the 75% quartile at month 9.
+
+Similarly the day of the month data shows a fairly even
+distribution as well. But there is one notible anomaly.
+The 15th day has a drastically higher number of birthdays
+than any other day. Whether this is an error or not I can't
+tell. The 31st has understandibly fewer birthdays than the
+other days since there are only 30 days in many months.
+
+  dates         months            days     
+2/6/14 :  8   Min.   : 1.000   Min.   : 1.0  
+5/22/14:  8   1st Qu.: 3.000   1st Qu.: 8.0  
+7/16/14:  8   Median : 7.000   Median :16.0  
+1/14/14:  7   Mean   : 6.474   Mean   :15.7  
+2/2/14 :  7   3rd Qu.: 9.000   3rd Qu.:23.0  
+2/23/14:  7   Max.   :12.000   Max.   :31.0  
+(Other):988                                  
