@@ -150,7 +150,7 @@ Notes:
 Notes:
 
 ```{r Correlation}
-
+cor.test(pf$age, pf$friend_count)
 ```
 
 Look up the documentation for the cor.test function.
@@ -158,13 +158,13 @@ Look up the documentation for the cor.test function.
 What's the correlation between age and friend count? Round to three decimal places.
 Response:
 
-***
+-0.027
 
 ### Correlation on Subsets
 Notes:
 
 ```{r Correlation on Subsets}
-with(                 , cor.test(age, friend_count))
+with(pf[pf$age <= 70,], cor.test(age, friend_count))
 ```
 
 ***
@@ -172,13 +172,17 @@ with(                 , cor.test(age, friend_count))
 ### Correlation Methods
 Notes:
 
-***
+http://www.statisticssolutions.com/correlation-pearson-kendall-spearman/
 
 ## Create Scatterplots
 Notes:
 
 ```{r}
-
+library(ggplot2)
+ggplot(aes(x = www_likes_received, y = likes_received), data = pf) +
+  geom_point()#alpha = 1/20, position = position_jitter(h = 0)) +
+  #xlim(13, 90) +
+  #coord_trans(y = "sqrt")
 ```
 
 ***
@@ -187,23 +191,28 @@ Notes:
 Notes:
 
 ```{r Strong Correlations}
-
+ggplot(aes(x = www_likes_received, y = likes_received), data = pf) +
+  geom_point() +
+  xlim(0, quantile(pf$www_likes_received, 0.95)) +
+  ylim(0, quantile(pf$likes_received, 0.95)) +
+  geom_smooth(method = 'lm', color = 'red')
 ```
 
 What's the correlation betwen the two variables? Include the top 5% of values for the variable in the calculation and round to 3 decimal places.
 
 ```{r Correlation Calcuation}
-
+with(pf, cor.test(www_likes_received, likes_received))
 ```
 
 Response:
 
-***
+0.948
+Variable is a superset of another
 
 ### Moira on Correlation
 Notes:
 
-***
+Highly corelated can mean that variables are dependent on the same thing or are similar.
 
 ### More Caution with Correlation
 Notes:
