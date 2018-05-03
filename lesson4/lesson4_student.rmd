@@ -1,3 +1,8 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
 Lesson 4
 ========================================================
 
@@ -218,8 +223,12 @@ Highly corelated can mean that variables are dependent on the same thing or are 
 Notes:
 
 ```{r More Caution With Correlation}
-install.packages('alr3')
+#install.packages('alr3')
 library(alr3)
+library(ggplot2)
+data(Mitchell)
+ggplot(aes(x = Month, y = Temp), data = Mitchell) +
+  geom_point()
 ```
 
 Create your plot!
@@ -233,11 +242,13 @@ Create your plot!
 ### Noisy Scatterplots
 a. Take a guess for the correlation coefficient for the scatterplot.
 
+0.9
+
 b. What is the actual correlation of the two variables?
 (Round to the thousandths place)
 
 ```{r Noisy Scatterplots}
-
+with(Mitchell, cor.test(Month, Temp))
 ```
 
 ***
@@ -246,7 +257,9 @@ b. What is the actual correlation of the two variables?
 Notes:
 
 ```{r Making Sense of Data}
-
+ggplot(aes(Month, Temp), data = Mitchell) +
+  geom_point() +
+  scale_x_continuous(breaks = seq(0, 204, 12))
 ```
 
 ***
@@ -256,16 +269,22 @@ Notes:
 What do you notice?
 Response:
 
+There is a cyclical pattern to the data going from low to high and back to low every 12 months. This is why I originally said there seems to be a 0.9 correlation coefficient to the data because I saw this pattern the first time I looked at the plot.
+
 Watch the solution video and check out the Instructor Notes!
 Notes:
 
-***
+```{r}
+ggplot(aes(x = (Month%%12), y = Temp), data = Mitchell) +
+  geom_point()
+```
 
 ### Understanding Noise: Age to Age Months
 Notes:
 
 ```{r Understanding Noise: Age to Age Months}
-
+pf$age_with_months <- (pf$age) + (1 - (pf$dob_month/12))
+head(pf)
 ```
 
 ***
@@ -273,20 +292,27 @@ Notes:
 ### Age with Months Means
 
 ```{r Age with Months Means}
+library(dplyr)
 
+age_with_months <- group_by(pf, age_with_months)
+pf.fc_by_age_months <- summarize(
+  age_with_months,
+  friend_count_mean = mean(friend_count),
+  friend_count_median = median(friend_count),
+  n = n()
+)
+
+pf.fc_by_age_months <- arrange(pf.fc_by_age_months, age_with_months)
+
+head(pf.fc_by_age_months)
 ```
 
-Programming Assignment
-```{r Programming Assignment}
-
-```
-
-***
 
 ### Noise in Conditional Means
 
 ```{r Noise in Conditional Means}
-
+ggplot(aes(x = age_with_months, y = friend_count_mean), data = subset(pf.fc_by_age_months, age_with_months<71)) +
+  geom_line()
 ```
 
 ***
@@ -295,7 +321,16 @@ Programming Assignment
 Notes:
 
 ```{r Smoothing Conditional Means}
-
+library(gridExtra)
+p1 <- ggplot(aes(x = age, y = friend_count_mean), data = subset(pf.fc_by_age, age < 71)) +
+  geom_line() +
+  geom_smooth()
+p2 <- ggplot(aes(x = age_with_months, y = friend_count_mean), data = subset(pf.fc_by_age_months, age_with_months < 71)) +
+  geom_line() +
+  geom_smooth()
+p3 <- ggplot(aes(x = round(age / 5) * 5, y = friend_count), data = subset(pf, age < 71)) +
+  geom_line(stat = 'summary', fun.y = 'mean')
+grid.arrange(p1, p2, p3)
 ```
 
 ***
@@ -303,12 +338,12 @@ Notes:
 ### Which Plot to Choose?
 Notes:
 
-***
+Make multiple plots during the exploritory phase and then refine them down into the best plots for distribution.
 
 ### Analyzing Two Variables
 Reflection:
 
-***
+Making multiple plots can show different features of the data. Also while summaries and correlations are good for a lot of things they are not always the best at portraying the data.
 
 Click **KnitHTML** to see all of your hard work and to have an html
 page of this lesson, your answers, and your notes!
