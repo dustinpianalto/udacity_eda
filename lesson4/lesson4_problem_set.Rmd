@@ -1,0 +1,220 @@
+---
+title: "lesson4_problem_set"
+author: "Dusty P"
+date: "May 14, 2018"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = normalizePath("C:/Users/Dusty/Documents/coding/projects/Udacity/Data Analysis/eda/lesson4"))
+library(ggplot2)
+```
+
+## Problem 1 Price vs. x
+
+```{r price_vs_x}
+ggplot(aes(x = x, y = price), data = diamonds) +
+  geom_point()
+```
+
+## 2. Findings - Price vs. x
+
+There is a general trend towards an increase in price at what appears to be an exponential rate as x increases. But there are a few outliers at x = 0
+
+## 3. Correlations
+
+```{r correlations}
+with(diamonds, cor.test(price, x))
+with(diamonds, cor.test(price, y))
+with(diamonds, cor.test(price, z))
+```
+
+What is the Correlation between price and x?
+0.88
+
+What is the correlation between price and y?
+0.87
+
+What is the correlation between price and z?
+0.86
+
+
+## 4. Price vs. Depth
+
+```{r price_vs_depth}
+ggplot(aes(x = depth, y = price), data = diamonds) +
+  geom_point()
+```
+
+
+## 5. Adjustments - Price vs. depth
+
+```{r adjustments}
+ggplot(data = diamonds, aes(x = depth, y = price)) + 
+  geom_point(alpha = 1/100) +
+  scale_x_continuous(breaks = seq(0, 80, 2))
+```
+
+
+## 6. Typical Depth Range
+
+Based on the scatterplot of depth vs. price, most diamonds are between what values of depth?
+60 - 64
+
+
+## 7. Correlation - Price and Depth
+
+```{r correlation_price_vs_depth}
+with(diamonds, cor.test(price, depth))
+```
+
+What is the correlation of depth vs. price?
+-0.01
+
+Based on the correlation coefficient woul dyou use depth to predict the price of a diamond?
+No
+
+Why?
+Because a lower coefficient inidcates that the two variables are not closely linked.
+
+
+## 8. Price vs. Carat
+
+```{r price_vs_carat}
+ggplot(aes(x = carat, y = price), data = diamonds) + 
+  geom_point() +
+  xlim(0, quantile(diamonds$carat, 0.99)) +
+  ylim(0, quantile(diamonds$price, 0.99))
+```
+
+
+## 9. Price vs. Volume
+
+```{r price_vs_volume}
+diamonds$volume = (diamonds$x * diamonds$y * diamonds$z)
+
+ggplot(aes(x = volume, y = price), data = diamonds) +
+  geom_point()
+```
+
+
+## 10. Findings - Price vs. Volume
+
+What are your observations from the price vs. volume scatterplot?
+There are some major outliers on the volume scale. Other than that the trend at least appears to be exponential price increase as volume increases.
+
+
+## 11. Correlations on Subsets
+
+What's the correlation of price and volume?
+Exclude diamonds that have a volume of 0 or that are greater than or equal to 800.
+
+```{r correlations_on_subsets}
+with(subset(diamonds, volume != 0 & volume < 800), cor.test(price, volume))
+```
+
+
+## 12. Adjustments - Price vs. Volume
+
+```{r adjustments_price_vs_volume}
+ggplot(aes(x = volume, y = price), data = subset(diamonds, volume != 0 & volume < 800)) +
+  geom_point(alpha = 1/20) +
+  geom_smooth(method = 'lm')
+```
+
+No it is not helpful to look at the linear smooth in this case because it does not fit the data very well.
+
+
+## 13. Mean Price by Clarity
+
+```{r mean_price_by_clarity}
+library(dplyr)
+
+d_by_clarity <- group_by(diamonds, clarity)
+diamondsByClarity <- summarize(
+  d_by_clarity,
+  mean_price = mean(price),
+  median_price = median(price),
+  min_price = min(price),
+  max_price = max(price),
+  n = n()
+)
+```
+
+
+## 14. Bar Charts of Mean Price
+
+```{r bar_charts_of_mean_price}
+data(diamonds)
+library(dplyr)
+
+diamonds_by_clarity <- group_by(diamonds, clarity)
+diamonds_mp_by_clarity <- summarise(diamonds_by_clarity, mean_price = mean(price))
+
+diamonds_by_color <- group_by(diamonds, color)
+diamonds_mp_by_color <- summarise(diamonds_by_color, mean_price = mean(price))
+
+library(gridExtra)
+p1 <- ggplot(aes(x = clarity, y = mean_price), data = diamonds_mp_by_clarity) +
+  geom_bar(stat = "identity")
+p2 <- ggplot(aes(x = color, y = mean_price), data = diamonds_mp_by_color) +
+  geom_bar(stat = "identity")
+grid.arrange(p1, p2)
+```
+
+
+## 15. Trends in Mean Price
+
+### What do you notice in each of the bar charts for mean price by clarity and mean price by color?
+In the clarity chart there is a downward trend from SI2 to WS1 but both of the end clarities. (I1 is lower than SI2 and IF is higher than WS1)
+In the color chart there is a gradual upwards trend from D to J with a slight dip at E.
+
+
+## 16. Gapminder Revisited
+
+The Gapminder website contains over 500 data sets with information about
+the world's population. Your task is to continue the investigation you did at the
+end of Problem Set 3 or you can start fresh and choose a different
+data set from Gapminder.
+
+If you’re feeling adventurous or want to try some data munging see if you can
+find a data set or scrape one from the web.
+
+In your investigation, examine pairs of variable and create 2-5 plots that make
+use of the techniques from Lesson 4.
+
+You can find a link to the Gapminder website in the Instructor Notes.
+
+```{r gapminder_revisited}
+data <- read.csv('indicator gapminder under5mortality.csv')
+fertility <- read.csv('total_fertility.csv')
+library(tidyr)
+library(gridExtra)
+library(reshape)
+
+data <- melt(data, id = ("X"))
+data <- cast(data, variable ~ X, mean)
+data <- data[1:216,]
+#data
+
+fertility <- melt(fertility, id = ("X"))
+fertility <- cast(fertility, variable ~ X, mean)
+#fertility
+
+us_data <- data.frame(
+  year = fertility$variable,
+  fertility = fertility$`United States`,
+ deaths = data$`United States`
+)
+
+p1 <- ggplot(aes(x = fertility, y = deaths), data = us_data) +
+  geom_point()
+p2 <- ggplot(aes(x = fertility, y = deaths), data = us_data) +
+  geom_point() +
+  geom_smooth()
+
+grid.arrange(p1, p2)
+```
+
+
