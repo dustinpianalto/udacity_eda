@@ -1,3 +1,17 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = normalizePath("C:/Users/Dusty/Documents/coding/projects/Udacity/Data Analysis/eda/lesson5"))
+library(ggplot2)
+library(dplyr)
+library(reshape2)
+```
+
 Lesson 5
 ========================================================
 
@@ -15,9 +29,7 @@ Notes:
 Notes:
 
 ```{r Third Qualitative Variable}
-library(ggplot2)
-library(dplyr)
-
+pf = read.csv('pseudo_facebook.tsv', sep = '\t')
 pf.fc_by_age_gender <- pf %>%
   filter(!is.na(gender)) %>%
   group_by(age, gender) %>%
@@ -57,8 +69,6 @@ Notes:
 
 ```{r}
 #install.packages('reshape2')
-library(reshape2)
-
 pf.fc_by_age_gender.wide <- dcast(pf.fc_by_age_gender,
                                   age ~ gender,
                                   value.var = 'median_friend_count')
@@ -126,7 +136,7 @@ ggplot(aes(x = age, y = friend_count), data = subset(pf, !is.na(year_joined.buck
 Notes:
 
 ```{r Friending Rate}
-
+with(subset(pf, tenure >= 1), summary(friend_count / tenure))
 ```
 
 ***
@@ -135,11 +145,14 @@ Notes:
 Notes:
 
 What is the median friend rate?
+0.2205
 
 What is the maximum friend rate?
+417.0
 
 ```{r Friendships Initiated}
-
+ggplot(aes(y = friendships_initiated/tenure, x = tenure), data = subset(pf, tenure >= 1)) +
+  geom_line(aes(color = year_joined.bucket), stat = 'summary', fun.y = mean)
 ```
 
 ***
@@ -149,29 +162,33 @@ Notes:
 
 ```{r Bias-Variance Tradeoff Revisited}
 
+#ggplot(aes(x = tenure, y = friendships_initiated / tenure),
+#       data = subset(pf, tenure >= 1)) +
+#  geom_line(aes(color = year_joined.bucket),
+#            stat = 'summary',
+#            fun.y = mean)
+#
+#ggplot(aes(x = 7 * round(tenure / 7), y = friendships_initiated / tenure),
+#       data = subset(pf, tenure > 0)) +
+#  geom_line(aes(color = year_joined.bucket),
+#            stat = "summary",
+#            fun.y = mean)
+#
+#ggplot(aes(x = 30 * round(tenure / 30), y = friendships_initiated / tenure),
+#       data = subset(pf, tenure > 0)) +
+#  geom_line(aes(color = year_joined.bucket),
+#            stat = "summary",
+#            fun.y = mean)
+#
+#ggplot(aes(x = 90 * round(tenure / 90), y = friendships_initiated / tenure),
+#       data = subset(pf, tenure > 0)) +
+#  geom_line(aes(color = year_joined.bucket),
+#            stat = "summary",
+#            fun.y = mean)
+
 ggplot(aes(x = tenure, y = friendships_initiated / tenure),
        data = subset(pf, tenure >= 1)) +
-  geom_line(aes(color = year_joined.bucket),
-            stat = 'summary',
-            fun.y = mean)
-
-ggplot(aes(x = 7 * round(tenure / 7), y = friendships_initiated / tenure),
-       data = subset(pf, tenure > 0)) +
-  geom_line(aes(color = year_joined.bucket),
-            stat = "summary",
-            fun.y = mean)
-
-ggplot(aes(x = 30 * round(tenure / 30), y = friendships_initiated / tenure),
-       data = subset(pf, tenure > 0)) +
-  geom_line(aes(color = year_joined.bucket),
-            stat = "summary",
-            fun.y = mean)
-
-ggplot(aes(x = 90 * round(tenure / 90), y = friendships_initiated / tenure),
-       data = subset(pf, tenure > 0)) +
-  geom_line(aes(color = year_joined.bucket),
-            stat = "summary",
-            fun.y = mean)
+  geom_smooth(aes(color = year_joined.bucket))
 
 ```
 
@@ -191,7 +208,13 @@ Notes:
 Notes:
 
 ```{r Histograms Revisited}
+yo <- read.csv('yogurt.csv')
 
+yo$id <- factor(yo$id)
+head(yo)
+
+ggplot(aes(x = price), data = yo) +
+  geom_histogram()
 ```
 
 ***
@@ -200,7 +223,8 @@ Notes:
 Notes:
 
 ```{r Number of Purchases}
-
+yo <- transform(yo, all.purchases = strawberry + blueberry + pina.colada + plain + mixed.berry)
+head(yo)
 ```
 
 ***
@@ -209,7 +233,11 @@ Notes:
 Notes:
 
 ```{r Prices over Time}
+ggplot(aes(x = time, y = price), data = yo) +
+  geom_point(alpha = 1/10)
 
+ggplot(aes(x = time, y = price), data = yo) +
+  geom_point(alpha = 1/10, aes(color = all.purchases))
 ```
 
 ***
@@ -222,7 +250,13 @@ Notes:
 ### Looking at Samples of Households
 
 ```{r Looking at Sample of Households}
+set.seed(1)
+sample.ids <- sample(levels(yo$id), 16)
 
+ggplot(aes(x = time, y = price), data = subset(yo, id %in% sample.ids)) +
+  facet_wrap( ~ id) +
+  geom_line() +
+  geom_point(aes(size = all.purchases), pch = 1)
 ```
 
 ***
@@ -240,7 +274,16 @@ Notes:
 ### Scatterplot Matrix
 Notes:
 
-***
+```{r}
+#install.packages('GGally')
+library(GGally)
+theme_set(theme_minimal(20))
+
+set.seed(1836)
+pf_subset <- pf[, c(2:15)]
+names(pf_subset)
+ggpairs(pf_subset[sample.int(nrow(pf_subset), 1000), ])
+```
 
 ### Even More Variables
 Notes:
@@ -256,7 +299,7 @@ colnames(nci) <- c(1:64)
 ```
 
 ```{r}
-nci.long.samp <- melt(as.matrix(nci[1:200,]))
+nci.long.samp <- melt(as.matrix(nci[1:2000,]))
 names(nci.long.samp) <- c("gene", "case", "value")
 head(nci.long.samp)
 
