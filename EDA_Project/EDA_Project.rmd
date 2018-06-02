@@ -29,20 +29,154 @@ This report explores a dataset containing chemical information and ratings on al
 ```{r echo=FALSE, message=FALSE, warning=FALSE, Load_the_Data}
 # Load the Data
 wqw <- read.csv('wineQualityWhites.csv')
+# because the first column is just row numbers I am going to remove it
+wqw <- subset(wqw, select = -X)
 ```
 
 # Univariate Plots Section
 
-> **Tip**: In this section, you should perform some preliminary exploration of
-your dataset. Run some summaries of the data and create univariate plots to
-understand the structure of the individual variables in your dataset. Don't
-forget to add a comment after each plot or closely-related group of plots!
-There should be multiple code chunks and text sections; the first one below is
-just to help you get started.
-
-```{r echo=FALSE, Univariate_Plots}
-
+```{r echo=FALSE, Data_Dimensions}
+dim(wqw)
 ```
+
+```{r echo=FALSE, Data_Structure}
+str(wqw)
+```
+
+```{r echo=False, Data_Summary}
+summary(wqw)
+```
+
+Our Data consists of 11 numerical variables and one Integer attribute which is the output with almost 4900 observations
+
+```{r echo=FALSE, quality_histogram}
+ggplot(aes(x = quality), data = wqw) + 
+  geom_histogram(binwidth = 1)
+```
+
+The distribution of the quality seems fairly normal with a peak at 6
+
+```{r echo=FALSE, alcohol_histogram}
+ggplot(aes(x = alcohol), data = wqw) + 
+  geom_histogram(binwidth = .1)
+```
+
+The Alcohol seems to be slightly long tailed, I want to see what it is like with a log transformation.
+
+```{r echo=FALSE, alcohol_histogram}
+ggplot(aes(x = alcohol), data = wqw) + 
+  geom_histogram(binwidth = .005) +
+  scale_x_log10()
+```
+
+```{r echo=FALSE, fixed.acidity_histogram}
+ggplot(aes(x = fixed.acidity), data = wqw) + 
+  geom_histogram(binwidth = .1)
+```
+
+The fixed.acidity definately has some outliers but besides that has a pretty normal distribution.
+
+```{r echo=FALSE, fixed.acidity_summary}
+summary(wqw$fixed.acidity)
+```
+
+Most Wines have a acidity between 6.3 and 7.3
+I am going to plot the data again removing both the high and low 1% of values to remove the outliers.
+
+```{r echo=FALSE, fixed.acidity_histogram}
+ggplot(aes(x = fixed.acidity), data = wqw) + 
+  geom_histogram(binwidth = .1) +
+  xlim(quantile(wqw$fixed.acidity, 0.01), quantile(wqw$fixed.acidity, 0.99))
+```
+
+And we see a fairly normal distribution with a peak around 6.8 which matches both the median (6.8) and mean (6.855) from the summary above.
+
+```{r echo=FALSE, volatile.acidity_histogram}
+ggplot(aes(x = volatile.acidity), data = wqw) + 
+  geom_histogram(binwidth = .01)
+```
+
+We have another long tailed distribution. I am going to plot again with a log_10 transformation this time.
+
+```{r echo=FALSE, volatile.acidity_histogram}
+ggplot(aes(x = volatile.acidity), data = wqw) + 
+  geom_histogram(binwidth = .04) +
+  scale_x_log10()
+```
+
+```{r echo=FALSE, citric.acid_histogram}
+ggplot(aes(x = citric.acid), data = wqw) + 
+  geom_histogram(binwidth = .01) +
+  xlim(quantile(wqw$citric.acid, 0.01), quantile(wqw$citric.acid, 0.99))
+```
+
+There is an odd spike at about 0.49 I might want to look into that more later.
+
+```{r echo=FALSE, residual.sugar_histogram}
+ggplot(aes(x = residual.sugar), data = wqw) + 
+  geom_histogram(binwidth = .1) +
+  xlim(quantile(wqw$residual.sugar, 0.01), quantile(wqw$residual.sugar, 0.99))
+```
+
+Even with the top and bottom 1% removed the plot is still very long tailed
+
+```{r echo=FALSE, residual.sugar_histogram}
+p1 <- ggplot(aes(x = residual.sugar), data = wqw) + 
+  geom_histogram(binwidth = .05) +
+  scale_x_log10()
+p2 <- ggplot(aes(x = residual.sugar), data = wqw) + 
+  geom_histogram(binwidth = .01) +
+  scale_x_log10(breaks = seq(0, 20, 2))
+grid.arrange(p1, p2)
+```
+
+```{r echo=FALSE, residual.sugar_summary}
+summary(wqw$residual.sugar)
+```
+
+Using a log_10 transform with a bin width of .05 indicates a bimodal distribution but if you decrease the binwidth to 0.01 it shows that while there are a lot of observations between ~4 and ~20 they are a lot more spread out and there are more individual of each value from ~0.5 to ~2. And we can see in the summary of the data that the median is 5.2 and the mean is 6.4 which puts both of them inbetween the two peaks.
+
+```{r echo=FALSE, chlorides_histogram}
+ggplot(aes(x = chlorides), data = wqw) + 
+  geom_histogram(binwidth = .001) +
+  xlim(0, quantile(wqw$chlorides, 0.97))
+```
+
+Here I just removed the top 3% of values to remove the long tail.
+
+```{r echo=FALSE, sulfur.dioxide_histograms}
+p1 <- ggplot(aes(x = free.sulfur.dioxide), data = wqw) + 
+  geom_histogram(binwidth = 1) +
+  xlim(0, quantile(wqw$free.sulfur.dioxide, 0.99))
+p2 <- ggplot(aes(x = total.sulfur.dioxide), data = wqw) + 
+  geom_histogram(binwidth = 1) +
+  xlim(quantile(wqw$total.sulfur.dioxide, 0.01), quantile(wqw$total.sulfur.dioxide, 0.99))
+grid.arrange(p1, p2)
+```
+
+I plotted the Free Sulphur Dioxide and Total Sulphur Dioxide together to save room and because they are related. Note the difference in scales on both axies.
+
+```{r echo=FALSE, density_histogram}
+ggplot(aes(x = density), data = wqw) + 
+  geom_histogram(binwidth = .0001) +
+  xlim(quantile(wqw$density, 0.01), quantile(wqw$density, 0.99))
+```
+
+```{r echo=FALSE, pH_histogram}
+ggplot(aes(x = pH), data = wqw) + 
+  geom_histogram(binwidth = .01)
+```
+
+The pH plot doesn't need any modification.
+
+```{r echo=FALSE, sulphates_histogram}
+ggplot(aes(x = sulphates), data = wqw) + 
+  geom_histogram(binwidth = .01)
+```
+
+
+
+density             pH          sulphates
 
 > **Tip**: Make sure that you leave a blank line between the start / end of
 each code block and the end / start of your Markdown text so that it is
