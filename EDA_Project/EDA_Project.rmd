@@ -176,33 +176,34 @@ ggplot(aes(x = sulphates), data = wqw) +
 
 
 
-density             pH          sulphates
-
-> **Tip**: Make sure that you leave a blank line between the start / end of
-each code block and the end / start of your Markdown text so that it is
-formatted nicely in the knitted text. Note as well that text on consecutive
-lines is treated as a single space. Make sure you have a blank line between
-your paragraphs so that they too are formatted for easy readability.
-
 # Univariate Analysis
-
-> **Tip**: Now that you've completed your univariate explorations, it's time to
-reflect on and summarize what you've found. Use the questions below to help you
-gather your observations and add your own if you have other thoughts!
 
 ### What is the structure of your dataset?
 
+There are 4898 samples in the dataset with 11 different variables and a resulting quality assesment. All of the variables are continuous number variables and the quality is an integer scale from 1 to 10 with max value of 9 and min of 3.
+
+Observations:
+ * The most common quality is 6 and it is a fairly normal distribution slightly skewed towards the low end.
+ * Most of the variables are similar in distribution, most of them are long tailed but besides that have a fairly normal distribution.
+ * There are a couple interesting features though, the Citric Acid has an odd spike around 4.9 and the Residual Sugar appears to be more of a bimodal distribution.
+ 
 ### What is/are the main feature(s) of interest in your dataset?
 
-### What other features in the dataset do you think will help support your \
-investigation into your feature(s) of interest?
+My main interest in this dataset is trying to determine which features have the greatest effect on the quality.
+
+### What other features in the dataset do you think will help support your investigation into your feature(s) of interest?
+
+I think that the Alcohol, Acidity, Density, and Ph will have the greatest impact on the quality.
 
 ### Did you create any new variables from existing variables in the dataset?
+
+I did not create any new variables.
 
 ### Of the features you investigated, were there any unusual distributions? \
 Did you perform any operations on the data to tidy, adjust, or change the form \
 of the data? If so, why did you do this?
 
+I either log transformed or removed the outliers on most of the datapoints to better view the data as most of them were longtailed.
 
 # Bivariate Plots Section
 
@@ -213,23 +214,157 @@ supporting variables. Try to look at relationships between supporting variables
 as well.
 
 ```{r echo=FALSE, Bivariate_Plots}
-
+ggpairs(wqw, axisLabels = "none", diag = list(continuous = wrap("diagAxis", labelSize=2, gridLabelSize=1)), upper = list(continuous = wrap("cor", size = 1.8)), lower = list(continuous = wrap("smooth", alpha=0.2, color = "orange")))
 ```
+
+Looking at this grid there are not very many variables that appear to correlate with each other which I find suprising as some of them seem like they should. I am going to explore some of them in more detail.
+
+One pair of variables that look like they have some correlation are density and residual sugar so I am going to start with them.
+
+```{r echo=FALSE, residual.sugar_vs_density}
+ggplot(aes(x = residual.sugar, y = density), data = wqw) +
+  geom_point(color = "orange")
+```
+
+Narrowing in on the main section and adding a smoothing line.
+
+```{r echo=FALSE, residual.sugar_vs_density_mod}
+ggplot(aes(x = residual.sugar, y = density), data = wqw) +
+  geom_point(alpha=0.3, color = "orange") +
+  xlim(0, 30) +
+  ylim(0.987, 1.0025) +
+  geom_smooth()
+```
+
+We can see a general trend as residual sugar increases the density also increases. Lets see both of these plotted against our output variable.
+
+```{r echo=FALSE, quality_vs_density}
+ggplot(aes(x = quality, y = density), data = wqw) +
+  ylim(0.985, 1.005) +
+  geom_point(alpha=0.1, position = position_jitter(h = 0), color = "blue") +
+  geom_line(stat = 'summary', fun.y = mean, color = "blue") +
+  geom_line(stat = 'summary', fun.y = median) +
+  geom_line(stat = 'summary', fun.y = quantile, fun.args = list(probs = 0.1), color = 'red', linetype = 2) +
+  geom_line(stat = 'summary', fun.y = quantile, fun.args = list(probs = 0.9), color = 'red', linetype = 2)
+```
+
+```{r echo=FALSE, quality_vs_residual.sugar}
+ggplot(aes(y = residual.sugar, x = quality), data = wqw) +
+  geom_point(alpha=0.1, color = "blue") +
+  xlim(0, 10) +
+  ylim(0, 30)
+```
+
+There doesn't seem to be any direct corelation between these variables and the quality. Lets look at some others.
+
+```{r echo=FALSE, quality_vs_alcohol}
+ggplot(aes(x = quality, y = alcohol), data = wqw) +
+  geom_point(alpha=0.1, color = "blue")
+```
+
+```{r echo=FALSE, quality_vs_alcohol}
+ggplot(aes(x = quality, y = alcohol), data = wqw) +
+  geom_point(alpha=0.1, position = position_jitter(h = 0), color = "blue") +
+  geom_line(stat = 'summary', fun.y = mean, color = "blue") +
+  geom_line(stat = 'summary', fun.y = median) +
+  geom_line(stat = 'summary', fun.y = quantile, fun.args = list(probs = 0.1), color = 'red', linetype = 2) +
+  geom_line(stat = 'summary', fun.y = quantile, fun.args = list(probs = 0.9), color = 'red', linetype = 2)
+```
+
+Adding jitter to the alcohol plot reveals that there could possibly be a corelation to quality but it is very weak.
+
+```{r echo=FALSE, quality_vs_fixed.acidity}
+ggplot(aes(x = quality, y = fixed.acidity), data = wqw) +
+  geom_point(alpha=0.1, position = position_jitter(h = 0), color = "blue")
+```
+
+```{r echo=FALSE, quality_vs_chlorides}
+ggplot(aes(x = quality, y = chlorides), data = wqw) +
+  geom_point(alpha=0.1, position = position_jitter(h = 0), color = "blue") +
+  ylim(0, 0.1) +
+  geom_line(stat = 'summary', fun.y = mean, color = "blue") +
+  geom_line(stat = 'summary', fun.y = median) +
+  geom_line(stat = 'summary', fun.y = quantile, fun.args = list(probs = 0.1), color = 'red', linetype = 2) +
+  geom_line(stat = 'summary', fun.y = quantile, fun.args = list(probs = 0.9), color = 'red', linetype = 2)
+```
+
+```{r echo=FALSE, quality_vs_tsd}
+ggplot(aes(x = quality, y = total.sulfur.dioxide), data = wqw) +
+  geom_point(alpha=0.1, position = position_jitter(h = 0), color = "blue")
+```
+
+Looking at these other variables shows that there is little to no relationship to the quality individually I think this will change when we start combining variables in the Multivariate plots.
+
+One other interesting corelation that I want to look at is density vs alcohol.
+
+```{r echo=FALSE, alcohol_vs_density}
+ggplot(aes(x = alcohol, y = density), data = wqw) +
+  geom_point(alpha=0.1, color = "blue") +
+  ylim(0.985, 1.005) +
+  geom_smooth()
+```
+
+Interestingly it appears that as the aocohol content increases the density decreases, this is the inverse of the residual sugar vs density that we plotted earlier. This probably has something to do with the fact that sugar is what the alcohol is created from so it would follow that as the alcohol increases the sugar and thence the density would decrease.
+
+We can see this more directly by plotting residual sugar against alcohol.
+
+```{r echo=FALSE, alcohol_vs_residual_sugar}
+ggplot(aes(x = alcohol, y = residual.sugar), data = wqw) +
+  geom_point(alpha=0.1, color = "blue") +
+  ylim(0, 30) +
+  geom_smooth()
+```
+
+We can see that there is a seemingly exponential relationship between alcohol and residual sugar.
+
+```{r echo=FALSE, alcohol_vs_chlorides}
+ggplot(aes(x = alcohol, y = chlorides), data = wqw) +
+  geom_point(alpha=0.1, color = "blue") +
+  ylim(0, 0.1) +
+  geom_smooth()
+```
+
+There does seem to be a slight corelation between alcohol and chlorides.
+
+```{r echo=FALSE, alcohol_vs_ph}
+ggplot(aes(x = pH, y = alcohol), data = wqw) +
+  geom_point(alpha=0.1, color = "blue") +
+  geom_smooth()
+```
+
+```{r echo=FALSE, alcohol_vs_fixed_acidity}
+ggplot(aes(x = fixed.acidity, y = alcohol), data = wqw) +
+  geom_point(alpha=0.1, color = "blue") +
+  geom_smooth()
+```
+
+```{r echo=FALSE, alcohol_vs_volatile_acidity}
+ggplot(aes(x = volatile.acidity, y = alcohol), data = wqw) +
+  geom_point(alpha=0.1, color = "blue") +
+  geom_smooth()
+```
+
+There does not seem to be any correlation between our other features of interest.
+
 
 # Bivariate Analysis
 
 > **Tip**: As before, summarize what you found in your bivariate explorations
 here. Use the questions below to guide your discussion.
 
-### Talk about some of the relationships you observed in this part of the \
-investigation. How did the feature(s) of interest vary with other features in \
-the dataset?
+### Talk about some of the relationships you observed in this part of the investigation. How did the feature(s) of interest vary with other features in the dataset?
 
-### Did you observe any interesting relationships between the other features \
-(not the main feature(s) of interest)?
+I discovered some interesting relationships between density, residual sugar and alcohol. The other features appear to have very little corelation to each other or to the quality. The other relationships that I noted are the ones that were expected. For instance the pH has a mild corelation to the fixed acidity although I expected a higher corelation. Same with total sulfur dioxide and free sulfur dioxide.
+
+It does seem like there is a mild corelation between the quality and alcohol as well as quality and density which are 2 of the features I noted in the previous section. There also might be a slight relationship between quality and chlorides.
+
+### Did you observe any interesting relationships between the other features (not the main feature(s) of interest)?
+
+One relationship that I found interesting is between alcohol and chlorides as well as between chlorides and quality. I wonder if this will show itself more in the multivariate exploration.
 
 ### What was the strongest relationship you found?
 
+By far the strongest relationship I found was between density and residual sugar.
 
 # Multivariate Plots Section
 
