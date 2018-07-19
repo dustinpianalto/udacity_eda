@@ -35,55 +35,55 @@ wqw <- subset(wqw, select = -X)
 
 # Univariate Plots Section
 
-```{r echo=FALSE, Data_Dimensions}
+```{r echo=FALSE, warning=FALSE, Data_Dimensions}
 dim(wqw)
 ```
 
-```{r echo=FALSE, Data_Structure}
+```{r echo=FALSE, warning=FALSE, Data_Structure}
 str(wqw)
 ```
 
-```{r echo=False, Data_Summary}
+```{r echo=FALSE, warning=FALSE, Data_Summary}
 summary(wqw)
 ```
 
 Our Data consists of 11 numerical variables and one Integer attribute which is the output with almost 4900 observations
 
-```{r echo=FALSE, quality_histogram}
+```{r echo=FALSE, warning=FALSE, quality_histogram}
 ggplot(aes(x = quality), data = wqw) + 
   geom_histogram(binwidth = 1)
 ```
 
 The distribution of the quality seems fairly normal with a peak at 6
 
-```{r echo=FALSE, alcohol_histogram}
+```{r echo=FALSE, warning=FALSE, alcohol_histogram}
 ggplot(aes(x = alcohol), data = wqw) + 
   geom_histogram(binwidth = .1)
 ```
 
 The Alcohol seems to be slightly long tailed, I want to see what it is like with a log transformation.
 
-```{r echo=FALSE, alcohol_histogram}
+```{r echo=FALSE, warning=FALSE, alcohol_histogram_log}
 ggplot(aes(x = alcohol), data = wqw) + 
   geom_histogram(binwidth = .005) +
   scale_x_log10()
 ```
 
-```{r echo=FALSE, fixed.acidity_histogram}
+```{r echo=FALSE, warning=FALSE, fixed.acidity_histogram}
 ggplot(aes(x = fixed.acidity), data = wqw) + 
   geom_histogram(binwidth = .1)
 ```
 
 The fixed.acidity definately has some outliers but besides that has a pretty normal distribution.
 
-```{r echo=FALSE, fixed.acidity_summary}
+```{r echo=FALSE, warning=FALSE, fixed.acidity_summary}
 summary(wqw$fixed.acidity)
 ```
 
 Most Wines have a acidity between 6.3 and 7.3
 I am going to plot the data again removing both the high and low 1% of values to remove the outliers.
 
-```{r echo=FALSE, fixed.acidity_histogram}
+```{r echo=FALSE, warning=FALSE, fixed.acidity_histogram_quantile}
 ggplot(aes(x = fixed.acidity), data = wqw) + 
   geom_histogram(binwidth = .1) +
   xlim(quantile(wqw$fixed.acidity, 0.01), quantile(wqw$fixed.acidity, 0.99))
@@ -91,20 +91,20 @@ ggplot(aes(x = fixed.acidity), data = wqw) +
 
 And we see a fairly normal distribution with a peak around 6.8 which matches both the median (6.8) and mean (6.855) from the summary above.
 
-```{r echo=FALSE, volatile.acidity_histogram}
+```{r echo=FALSE, warning=FALSE, volatile.acidity_histogram}
 ggplot(aes(x = volatile.acidity), data = wqw) + 
   geom_histogram(binwidth = .01)
 ```
 
 We have another long tailed distribution. I am going to plot again with a log_10 transformation this time.
 
-```{r echo=FALSE, volatile.acidity_histogram}
+```{r echo=FALSE, warning=FALSE, volatile.acidity_histogram_log}
 ggplot(aes(x = volatile.acidity), data = wqw) + 
   geom_histogram(binwidth = .04) +
   scale_x_log10()
 ```
 
-```{r echo=FALSE, citric.acid_histogram}
+```{r echo=FALSE, warning=FALSE, citric.acid_histogram}
 ggplot(aes(x = citric.acid), data = wqw) + 
   geom_histogram(binwidth = .01) +
   xlim(quantile(wqw$citric.acid, 0.01), quantile(wqw$citric.acid, 0.99))
@@ -112,7 +112,7 @@ ggplot(aes(x = citric.acid), data = wqw) +
 
 There is an odd spike at about 0.49 I might want to look into that more later.
 
-```{r echo=FALSE, residual.sugar_histogram}
+```{r echo=FALSE, warning=FALSE, residual.sugar_histogram}
 ggplot(aes(x = residual.sugar), data = wqw) + 
   geom_histogram(binwidth = .1) +
   xlim(quantile(wqw$residual.sugar, 0.01), quantile(wqw$residual.sugar, 0.99))
@@ -120,7 +120,7 @@ ggplot(aes(x = residual.sugar), data = wqw) +
 
 Even with the top and bottom 1% removed the plot is still very long tailed
 
-```{r echo=FALSE, residual.sugar_histogram}
+```{r echo=FALSE, warning=FALSE, residual.sugar_histogram_log}
 p1 <- ggplot(aes(x = residual.sugar), data = wqw) + 
   geom_histogram(binwidth = .05) +
   scale_x_log10()
@@ -130,13 +130,13 @@ p2 <- ggplot(aes(x = residual.sugar), data = wqw) +
 grid.arrange(p1, p2)
 ```
 
-```{r echo=FALSE, residual.sugar_summary}
+```{r echo=FALSE, warning=FALSE, residual.sugar_summary}
 summary(wqw$residual.sugar)
 ```
 
-Using a log_10 transform with a bin width of .05 indicates a bimodal distribution but if you decrease the binwidth to 0.01 it shows that while there are a lot of observations between ~4 and ~20 they are a lot more spread out and there are more individual of each value from ~0.5 to ~2. And we can see in the summary of the data that the median is 5.2 and the mean is 6.4 which puts both of them inbetween the two peaks.
+Using a log_10 transform with a bin width of .05 indicates a bimodal distribution but if you decrease the binwidth to 0.01 it shows that while there are a lot of observations between ~4 and ~20 they are a lot more spread out and there are more individual of each value from ~0.5 to ~2. This is probably is because it is harder to measure the residual sugar as a continuous scale and so the steps are more apparent at the lower, more spread out, values. And we can see in the summary of the data that the median is 5.2 and the mean is 6.4 which puts both of them inbetween the two peaks.
 
-```{r echo=FALSE, chlorides_histogram}
+```{r echo=FALSE, warning=FALSE, chlorides_histogram}
 ggplot(aes(x = chlorides), data = wqw) + 
   geom_histogram(binwidth = .001) +
   xlim(0, quantile(wqw$chlorides, 0.97))
@@ -144,7 +144,7 @@ ggplot(aes(x = chlorides), data = wqw) +
 
 Here I just removed the top 3% of values to remove the long tail.
 
-```{r echo=FALSE, sulfur.dioxide_histograms}
+```{r echo=FALSE, warning=FALSE, sulfur.dioxide_histograms}
 p1 <- ggplot(aes(x = free.sulfur.dioxide), data = wqw) + 
   geom_histogram(binwidth = 1) +
   xlim(0, quantile(wqw$free.sulfur.dioxide, 0.99))
@@ -156,20 +156,20 @@ grid.arrange(p1, p2)
 
 I plotted the Free Sulphur Dioxide and Total Sulphur Dioxide together to save room and because they are related. Note the difference in scales on both axies.
 
-```{r echo=FALSE, density_histogram}
+```{r echo=FALSE, warning=FALSE, density_histogram}
 ggplot(aes(x = density), data = wqw) + 
   geom_histogram(binwidth = .0001) +
   xlim(quantile(wqw$density, 0.01), quantile(wqw$density, 0.99))
 ```
 
-```{r echo=FALSE, pH_histogram}
+```{r echo=FALSE, warning=FALSE, pH_histogram}
 ggplot(aes(x = pH), data = wqw) + 
   geom_histogram(binwidth = .01)
 ```
 
 The pH plot doesn't need any modification.
 
-```{r echo=FALSE, sulphates_histogram}
+```{r echo=FALSE, warning=FALSE, sulphates_histogram}
 ggplot(aes(x = sulphates), data = wqw) + 
   geom_histogram(binwidth = .01)
 ```
@@ -213,22 +213,23 @@ yourself to relationships between a main output feature and one of the
 supporting variables. Try to look at relationships between supporting variables
 as well.
 
-```{r echo=FALSE, Bivariate_Plots}
-ggpairs(wqw, axisLabels = "none", diag = list(continuous = wrap("diagAxis", labelSize=2, gridLabelSize=1)), upper = list(continuous = wrap("cor", size = 1.8)), lower = list(continuous = wrap("smooth", alpha=0.2, color = "orange")))
+```{r echo=FALSE, warning=FALSE, Bivariate_Plots}
+ggpairs(wqw, upper = list(continuous = wrap("cor", size = 1.8)), lower = list(continuous = wrap("smooth", alpha=0.2, color = "orange"))) +
+  theme_grey(base_size = 6)
 ```
 
 Looking at this grid there are not very many variables that appear to correlate with each other which I find suprising as some of them seem like they should. I am going to explore some of them in more detail.
 
 One pair of variables that look like they have some correlation are density and residual sugar so I am going to start with them.
 
-```{r echo=FALSE, residual.sugar_vs_density}
+```{r echo=FALSE, warning=FALSE, residual.sugar_vs_density}
 ggplot(aes(x = residual.sugar, y = density), data = wqw) +
   geom_point(color = "orange")
 ```
 
 Narrowing in on the main section and adding a smoothing line.
 
-```{r echo=FALSE, residual.sugar_vs_density_mod}
+```{r echo=FALSE, warning=FALSE, residual.sugar_vs_density_mod}
 ggplot(aes(x = residual.sugar, y = density), data = wqw) +
   geom_point(alpha=0.3, color = "orange") +
   xlim(0, 30) +
@@ -238,7 +239,7 @@ ggplot(aes(x = residual.sugar, y = density), data = wqw) +
 
 We can see a general trend as residual sugar increases the density also increases. Lets see both of these plotted against our output variable.
 
-```{r echo=FALSE, quality_vs_density}
+```{r echo=FALSE, warning=FALSE, quality_vs_density}
 ggplot(aes(x = quality, y = density), data = wqw) +
   ylim(0.985, 1.005) +
   geom_point(alpha=0.1, position = position_jitter(h = 0), color = "blue") +
@@ -248,7 +249,7 @@ ggplot(aes(x = quality, y = density), data = wqw) +
   geom_line(stat = 'summary', fun.y = quantile, fun.args = list(probs = 0.9), color = 'red', linetype = 2)
 ```
 
-```{r echo=FALSE, quality_vs_residual.sugar}
+```{r echo=FALSE, warning=FALSE, quality_vs_residual.sugar}
 ggplot(aes(y = residual.sugar, x = quality), data = wqw) +
   geom_point(alpha=0.1, color = "blue") +
   xlim(0, 10) +
@@ -257,12 +258,12 @@ ggplot(aes(y = residual.sugar, x = quality), data = wqw) +
 
 There doesn't seem to be any direct corelation between these variables and the quality. Lets look at some others.
 
-```{r echo=FALSE, quality_vs_alcohol}
+```{r echo=FALSE, warning=FALSE, quality_vs_alcohol}
 ggplot(aes(x = quality, y = alcohol), data = wqw) +
   geom_point(alpha=0.1, color = "blue")
 ```
 
-```{r echo=FALSE, quality_vs_alcohol}
+```{r echo=FALSE, warning=FALSE, quality_vs_alcohol_w_summaries}
 ggplot(aes(x = quality, y = alcohol), data = wqw) +
   geom_point(alpha=0.1, position = position_jitter(h = 0), color = "blue") +
   geom_line(stat = 'summary', fun.y = mean, color = "blue") +
@@ -273,12 +274,12 @@ ggplot(aes(x = quality, y = alcohol), data = wqw) +
 
 Adding jitter to the alcohol plot reveals that there could possibly be a corelation to quality but it is very weak.
 
-```{r echo=FALSE, quality_vs_fixed.acidity}
+```{r echo=FALSE, warning=FALSE, quality_vs_fixed.acidity}
 ggplot(aes(x = quality, y = fixed.acidity), data = wqw) +
   geom_point(alpha=0.1, position = position_jitter(h = 0), color = "blue")
 ```
 
-```{r echo=FALSE, quality_vs_chlorides}
+```{r echo=FALSE, warning=FALSE, quality_vs_chlorides}
 ggplot(aes(x = quality, y = chlorides), data = wqw) +
   geom_point(alpha=0.1, position = position_jitter(h = 0), color = "blue") +
   ylim(0, 0.1) +
@@ -288,7 +289,7 @@ ggplot(aes(x = quality, y = chlorides), data = wqw) +
   geom_line(stat = 'summary', fun.y = quantile, fun.args = list(probs = 0.9), color = 'red', linetype = 2)
 ```
 
-```{r echo=FALSE, quality_vs_tsd}
+```{r echo=FALSE, warning=FALSE, quality_vs_tsd}
 ggplot(aes(x = quality, y = total.sulfur.dioxide), data = wqw) +
   geom_point(alpha=0.1, position = position_jitter(h = 0), color = "blue")
 ```
@@ -297,51 +298,49 @@ Looking at these other variables shows that there is little to no relationship t
 
 One other interesting corelation that I want to look at is density vs alcohol.
 
-```{r echo=FALSE, alcohol_vs_density}
+```{r echo=FALSE, warning=FALSE, alcohol_vs_density}
 ggplot(aes(x = alcohol, y = density), data = wqw) +
   geom_point(alpha=0.1, color = "blue") +
   ylim(0.985, 1.005) +
-  geom_smooth()
+  geom_smooth(method = "gam")
 ```
 
 Interestingly it appears that as the aocohol content increases the density decreases, this is the inverse of the residual sugar vs density that we plotted earlier. This probably has something to do with the fact that sugar is what the alcohol is created from so it would follow that as the alcohol increases the sugar and thence the density would decrease.
 
 We can see this more directly by plotting residual sugar against alcohol.
 
-```{r echo=FALSE, alcohol_vs_residual_sugar}
+```{r echo=FALSE, warning=FALSE, alcohol_vs_residual_sugar}
 ggplot(aes(x = alcohol, y = residual.sugar), data = wqw) +
   geom_point(alpha=0.1, color = "blue") +
   ylim(0, 30) +
-  geom_smooth()
+  geom_smooth(method = "gam")
 ```
 
 We can see that there is a seemingly exponential relationship between alcohol and residual sugar.
 
-```{r echo=FALSE, alcohol_vs_chlorides}
+```{r echo=FALSE, warning=FALSE, alcohol_vs_chlorides}
 ggplot(aes(x = alcohol, y = chlorides), data = wqw) +
   geom_point(alpha=0.1, color = "blue") +
   ylim(0, 0.1) +
-  geom_smooth()
+  geom_smooth(method = "gam")
 ```
 
 There does seem to be a slight corelation between alcohol and chlorides.
 
-```{r echo=FALSE, alcohol_vs_ph}
+```{r echo=FALSE, warning=FALSE, alcohol_vs_ph}
 ggplot(aes(x = pH, y = alcohol), data = wqw) +
   geom_point(alpha=0.1, color = "blue") +
-  geom_smooth()
+  geom_smooth(method = "gam")
 ```
 
-```{r echo=FALSE, alcohol_vs_fixed_acidity}
+```{r echo=FALSE, warning=FALSE, alcohol_vs_fixed_acidity}
 ggplot(aes(x = fixed.acidity, y = alcohol), data = wqw) +
   geom_point(alpha=0.1, color = "blue") +
-  geom_smooth()
 ```
 
-```{r echo=FALSE, alcohol_vs_volatile_acidity}
+```{r echo=FALSE, warning=FALSE, alcohol_vs_volatile_acidity}
 ggplot(aes(x = volatile.acidity, y = alcohol), data = wqw) +
   geom_point(alpha=0.1, color = "blue") +
-  geom_smooth()
 ```
 
 There does not seem to be any correlation between our other features of interest.
@@ -375,9 +374,62 @@ create here are justified by the plots you explored in the previous section. If
 you plan on creating any mathematical models, this is the section where you
 will do that.
 
-```{r echo=FALSE, Multivariate_Plots}
-
+```{r echo=FALSE, warning=FALSE, alcohol_chlorides_quality}
+ggplot(aes(x = alcohol, y = chlorides), data = wqw) +
+  geom_point(aes(color = quality))
 ```
+
+```{r echo=FALSE, warning=FALSE, alcohol_residual.sugar_quality}
+ggplot(aes(x = alcohol, y = residual.sugar), data = wqw) +
+  geom_point(aes(color = quality)) +
+  ylim(0, 30)
+```
+
+```{r echo=FALSE, warning=FALSE, density_pH_quality}
+ggplot(aes(x = density, y = pH), data = wqw) +
+  geom_point(aes(color = quality)) +
+  xlim(0.985, 1.005)
+```
+
+```{r echo=FALSE, warning=FALSE, free.sulfur.dioxide_pH_quality}
+ggplot(aes(x = free.sulfur.dioxide, y = pH), data = wqw) +
+  geom_point(aes(color = quality)) +
+  xlim(0, 100)
+```
+
+```{r echo=FALSE, warning=FALSE, alcohol_pH_quality}
+ggplot(aes(x = alcohol, y = pH), data = wqw) +
+  geom_point(aes(color = quality))
+```
+
+```{r echo=FALSE, warning=FALSE, alcohol_density_quality}
+ggplot(aes(x = alcohol, y = density), data = wqw) +
+  geom_point(aes(color = quality), position = position_jitter(h = 0)) +
+  ylim(0.985, 1.005)
+```
+
+This is really the only plot that I have tried that seems to indicate any sort of corelation between any of the variables and the quality and it is very weak. The quality is only slightly squewed towards higher alcohol and lower density (which we discovered an inverse corelation between alcohol and density earlier so that should make sense).
+
+Lets see if a linear model can make any predictions.
+
+```{r echo=FALSE, warning=FALSE, Building_the_Linear_Model}
+m1 <- lm(I(quality) ~ I(alcohol), data = wqw)
+m2 <- update(m1, ~ . + density)
+m3 <- update(m2, ~ . + residual.sugar)
+m4 <- update(m3, ~ . + chlorides)
+m5 <- update(m4, ~ . + sulphates)
+m6 <- update(m5, ~ . + pH)
+m7 <- update(m6, ~ . + fixed.acidity)
+m8 <- update(m7, ~ . + volatile.acidity)
+m9 <- update(m8, ~ . + citric.acid)
+m10 <- update(m9, ~ . + free.sulfur.dioxide)
+m11 <- update(m10, ~ . + total.sulfur.dioxide)
+mtable(m1, m2, m5, m6, m9, m11, sdigits = 3)
+```
+
+As we can see even when taking into account every feature the R-squared is still only 0.282 which is dismal at best and indicates that we can not make any predictions based on the data that we have.
+
+(I had to remove some of the intermediary steps to make it fit on the page.)
 
 # Multivariate Analysis
 
@@ -385,10 +437,18 @@ will do that.
 investigation. Were there features that strengthened each other in terms of \
 looking at your feature(s) of interest?
 
+All of the features that I investigated in this section show a dramatic lack of corelation. Even when combining features in different ways there was little to no interaction.
+
+There were a few things that I discovered earlier that were confirmed but there wasn't really anything new to explore.
+
 ### Were there any interesting or surprising interactions between features?
+
+The only interesting thing was the complete lack of interesting interactions between features.
 
 ### OPTIONAL: Did you create any models with your dataset? Discuss the \
 strengths and limitations of your model.
+
+I did create a basic model and it was not able to predict anything. The main limitation of the model is that none of the features are corelated to the quality in any meaningful way.
 
 ------
 
@@ -404,26 +464,46 @@ make sure you justify why you chose each plot by describing what it shows.
 
 ### Plot One
 ```{r echo=FALSE, Plot_One}
-
+ggpairs(wqw, upper = list(continuous = wrap("cor", size = 1.8)), lower = list(continuous = wrap("smooth", alpha=0.2, color = "orange"))) +
+  theme_grey(base_size = 6) +
+  ggtitle("Scatterplot Matrix") +
+  theme(plot.title = element_text(size=22, hjust = 0.5))
 ```
 
 ### Description One
 
+This is a good summary of the data that we have and it shows how there is no direct corelation between any of the variables and the quality. You can see some moderate corelation between some of the features such as residual sugar and density. Some of these corelations are something I focused on.
 
 ### Plot Two
-```{r echo=FALSE, Plot_Two}
-
+```{r echo=FALSE, warning=FALSE, Plot_Two}
+ggplot(aes(x = quality, y = alcohol), data = wqw) +
+  geom_point(alpha=0.1, position = position_jitter(h = 0), color = "blue") +
+  geom_line(stat = 'summary', fun.y = mean, color = "blue") +
+  geom_line(stat = 'summary', fun.y = median, color = "black") +
+  geom_line(stat = 'summary', fun.y = quantile, fun.args = list(probs = 0.1), color = 'red', linetype = 2) +
+  geom_line(stat = 'summary', fun.y = quantile, fun.args = list(probs = 0.9), color = 'red', linetype = 2) +
+  ggtitle("Alcohol vs Quality") +
+  xlab("Quality") +
+  ylab("Alcohol") +
+  theme(plot.title = element_text(size=22, hjust = 0.5))
 ```
 
 ### Description Two
 
+Alcohol content is the closest that any of the features came to corelating with the quality and here you can see that even that corelation is very weak. The only thing we can tell is that more higher quality wines had a higher alcohol content than lower quality, but the spread on the data makes this a very weak corelation at 0.436.
 
 ### Plot Three
-```{r echo=FALSE, Plot_Three}
-
+```{r echo=FALSE, warning=FALSE, Plot_Three}
+ggplot(aes(x = density, y = alcohol), data = wqw) +
+  geom_point(aes(color = quality)) +
+  xlim(0.985, 1.005) +
+  labs(x = "Density", y = "Alcohol", title = "Alcohol vs Density by Quality", color = "Quality") +
+  theme(plot.title = element_text(size=22, hjust = 0.5))
 ```
 
 ### Description Three
+
+I include this plot just to show how there is no clear distinction in the quality when compared to the features of the data. This is representative of all of the plots I made in this section.
 
 ------
 
