@@ -6,7 +6,8 @@ output: html_document
 ---
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, setup}
-knitr::opts_knit$set(root.dir = normalizePath("C:/Users/Dusty/Documents/coding/projects/Udacity/Data Analysis/eda/EDA_Project"))
+knitr::opts_knit$set(
+  root.dir = normalizePath("C:/Users/Dusty/Documents/coding/projects/Udacity/Data Analysis/eda/EDA_Project"))
 
 # load the ggplot graphics package and the others
 library(ggplot2)
@@ -18,7 +19,8 @@ library(RColorBrewer)
 library(bitops)
 library(RCurl)
 
-cuberoot_trans = function() trans_new('cuberoot', transform = function(x) x^(1/3),
+cuberoot_trans = function() trans_new('cuberoot',
+                                      transform = function(x) x^(1/3),
                                       inverse = function(x) x^3)
 ```
 
@@ -66,7 +68,7 @@ The Alcohol seems to be slightly long tailed, I want to see what it is like with
 ```{r echo=FALSE, warning=FALSE, alcohol_histogram_log}
 ggplot(aes(x = alcohol), data = wqw) + 
   geom_histogram(binwidth = .005) +
-  scale_x_log10()
+  scale_x_log10(breaks = c(8, 9, 10, 11, 12, 13, 14))
 ```
 
 ```{r echo=FALSE, warning=FALSE, fixed.acidity_histogram}
@@ -101,7 +103,7 @@ We have another long tailed distribution. I am going to plot again with a log_10
 ```{r echo=FALSE, warning=FALSE, volatile.acidity_histogram_log}
 ggplot(aes(x = volatile.acidity), data = wqw) + 
   geom_histogram(binwidth = .04) +
-  scale_x_log10()
+  scale_x_log10(breaks = seq(0.1, 1.0, 0.1))
 ```
 
 ```{r echo=FALSE, warning=FALSE, citric.acid_histogram}
@@ -123,10 +125,10 @@ Even with the top and bottom 1% removed the plot is still very long tailed
 ```{r echo=FALSE, warning=FALSE, residual.sugar_histogram_log}
 p1 <- ggplot(aes(x = residual.sugar), data = wqw) + 
   geom_histogram(binwidth = .05) +
-  scale_x_log10()
+  scale_x_log10(breaks = c(0, 1, 2, 4, 6, 8, 12, 16, 20, 40, 65))
 p2 <- ggplot(aes(x = residual.sugar), data = wqw) + 
   geom_histogram(binwidth = .01) +
-  scale_x_log10(breaks = seq(0, 20, 2))
+  scale_x_log10(breaks = c(0, 1, 2, 4, 6, 8, 12, 16, 20, 40, 65))
 grid.arrange(p1, p2)
 ```
 
@@ -150,7 +152,8 @@ p1 <- ggplot(aes(x = free.sulfur.dioxide), data = wqw) +
   xlim(0, quantile(wqw$free.sulfur.dioxide, 0.99))
 p2 <- ggplot(aes(x = total.sulfur.dioxide), data = wqw) + 
   geom_histogram(binwidth = 1) +
-  xlim(quantile(wqw$total.sulfur.dioxide, 0.01), quantile(wqw$total.sulfur.dioxide, 0.99))
+  xlim(quantile(wqw$total.sulfur.dioxide, 0.01),
+       quantile(wqw$total.sulfur.dioxide, 0.99))
 grid.arrange(p1, p2)
 ```
 
@@ -207,8 +210,10 @@ I either log transformed or removed the outliers on most of the datapoints to be
 
 # Bivariate Plots Section
 
-```{r echo=FALSE, warning=FALSE, Bivariate_Plots}
-ggpairs(wqw, upper = list(continuous = wrap("cor", size = 1.8)), lower = list(continuous = wrap("smooth", alpha=0.2, color = "orange"))) +
+```{r echo=FALSE, warning=FALSE, fig.width=10, fig.height=10, Bivariate_Plots}
+ggpairs(wqw, upper = list(continuous = wrap("cor", size = 1.8)),
+        lower = list(continuous = wrap("smooth", alpha=0.2,
+                                       color = "orange"))) +
   theme_grey(base_size = 6)
 ```
 
@@ -239,8 +244,10 @@ ggplot(aes(x = quality, y = density), data = wqw) +
   geom_point(alpha=0.1, position = position_jitter(h = 0), color = "blue") +
   geom_line(stat = 'summary', fun.y = mean, color = "blue") +
   geom_line(stat = 'summary', fun.y = median) +
-  geom_line(stat = 'summary', fun.y = quantile, fun.args = list(probs = 0.1), color = 'red', linetype = 2) +
-  geom_line(stat = 'summary', fun.y = quantile, fun.args = list(probs = 0.9), color = 'red', linetype = 2)
+  geom_line(stat = 'summary', fun.y = quantile, fun.args = list(probs = 0.1),
+            color = 'red', linetype = 2) +
+  geom_line(stat = 'summary', fun.y = quantile, fun.args = list(probs = 0.9),
+            color = 'red', linetype = 2)
 ```
 
 ```{r echo=FALSE, warning=FALSE, quality_vs_residual.sugar}
@@ -262,8 +269,10 @@ ggplot(aes(x = quality, y = alcohol), data = wqw) +
   geom_point(alpha=0.1, position = position_jitter(h = 0), color = "blue") +
   geom_line(stat = 'summary', fun.y = mean, color = "blue") +
   geom_line(stat = 'summary', fun.y = median) +
-  geom_line(stat = 'summary', fun.y = quantile, fun.args = list(probs = 0.1), color = 'red', linetype = 2) +
-  geom_line(stat = 'summary', fun.y = quantile, fun.args = list(probs = 0.9), color = 'red', linetype = 2)
+  geom_line(stat = 'summary', fun.y = quantile, fun.args = list(probs = 0.1),
+            color = 'red', linetype = 2) +
+  geom_line(stat = 'summary', fun.y = quantile, fun.args = list(probs = 0.9),
+            color = 'red', linetype = 2)
 ```
 
 Adding jitter to the alcohol plot reveals that there could possibly be a corelation to quality but it is very weak.
@@ -279,8 +288,10 @@ ggplot(aes(x = quality, y = chlorides), data = wqw) +
   ylim(0, 0.1) +
   geom_line(stat = 'summary', fun.y = mean, color = "blue") +
   geom_line(stat = 'summary', fun.y = median) +
-  geom_line(stat = 'summary', fun.y = quantile, fun.args = list(probs = 0.1), color = 'red', linetype = 2) +
-  geom_line(stat = 'summary', fun.y = quantile, fun.args = list(probs = 0.9), color = 'red', linetype = 2)
+  geom_line(stat = 'summary', fun.y = quantile, fun.args = list(probs = 0.1),
+            color = 'red', linetype = 2) +
+  geom_line(stat = 'summary', fun.y = quantile, fun.args = list(probs = 0.9),
+            color = 'red', linetype = 2)
 ```
 
 ```{r echo=FALSE, warning=FALSE, quality_vs_tsd}
@@ -358,62 +369,118 @@ By far the strongest relationship I found was between density and residual sugar
 
 # Multivariate Plots Section
 
+Since there seems to be a relationship bewteen alcohol and chlorides as well as chlorides and quality lets take a look at that relationship first.
+
 ```{r echo=FALSE, warning=FALSE, alcohol_chlorides_quality}
 ggplot(aes(x = alcohol, y = chlorides), data = wqw) +
-  geom_point(aes(color = quality))
+  geom_point(aes(color = factor(quality))) +
+  scale_color_brewer(palette = "RdYlGn") +
+  theme_dark()
 ```
+
+I find this to be suprising. I expected at least a mild distiction in this plot but it only shows a general trend that the higher the alcohol the more likely to have a higher quality but there isn't anything here we can use to make accurate predictions.
+
+Lets take a look at some other relationships we identified earlier.
 
 ```{r echo=FALSE, warning=FALSE, alcohol_residual.sugar_quality}
 ggplot(aes(x = alcohol, y = residual.sugar), data = wqw) +
-  geom_point(aes(color = quality)) +
-  ylim(0, 30)
+  geom_point(aes(color = factor(quality))) +
+  ylim(0, 30) +
+  scale_color_brewer(palette = "RdYlGn") +
+  theme_dark()
 ```
+
+Again just a higher chance for a higher quality as the alcohol increases. It doesn't look like the residual sugar plays into it much at all.
 
 ```{r echo=FALSE, warning=FALSE, density_pH_quality}
 ggplot(aes(x = density, y = pH), data = wqw) +
-  geom_point(aes(color = quality)) +
-  xlim(0.985, 1.005)
+  geom_point(aes(color = factor(quality))) +
+  xlim(0.985, 1.005) +
+  scale_color_brewer(palette = "RdYlGn") +
+  theme_dark()
 ```
 
-```{r echo=FALSE, warning=FALSE, free.sulfur.dioxide_pH_quality}
-ggplot(aes(x = free.sulfur.dioxide, y = pH), data = wqw) +
-  geom_point(aes(color = quality)) +
-  xlim(0, 100)
+There is no real discinction here, possibly a slightly higher chance for high quality at a lower density. But apparently pH doesn't matter at all.
+
+```{r echo=FALSE, warning=FALSE, free.sulfur.dioxide_fixed.acidity_quality}
+ggplot(aes(x = free.sulfur.dioxide, y = fixed.acidity), data = wqw) +
+  geom_point(aes(color = factor(quality))) +
+  xlim(0, 100) +
+  scale_color_brewer(palette = "RdYlGn") +
+  theme_dark()
 ```
 
-```{r echo=FALSE, warning=FALSE, alcohol_pH_quality}
-ggplot(aes(x = alcohol, y = pH), data = wqw) +
-  geom_point(aes(color = quality))
+It looks like there might be a trend towards lower fixed acidity. I wonder about a combination of fixed and volatile acidity when combined with alcohol.
+
+```{r echo=FALSE, warning=FALSE, alcohol_fixed.volatile.acidity_quality}
+ggplot(aes(x = alcohol, y = fixed.acidity + volatile.acidity), data = wqw) +
+  geom_point(aes(color = factor(quality))) +
+  scale_color_brewer(palette = "RdYlGn") +
+  theme_dark()
 ```
+
+Doesn't really appear to be any different than just alcohol content. There might be a slight trend towards lower acidity.
 
 ```{r echo=FALSE, warning=FALSE, alcohol_density_quality}
 ggplot(aes(x = alcohol, y = density), data = wqw) +
-  geom_point(aes(color = quality), position = position_jitter(h = 0)) +
-  ylim(0.985, 1.005)
+  geom_point(aes(color = factor(quality)), position = position_jitter(h = 0)) +
+  ylim(0.985, 1.005) +
+  scale_color_brewer(palette = "RdYlGn") +
+  theme_dark()
 ```
 
-This is really the only plot that I have tried that seems to indicate any sort of corelation between any of the variables and the quality and it is very weak. The quality is only slightly squewed towards higher alcohol and lower density (which we discovered an inverse corelation between alcohol and density earlier so that should make sense).
+These last two plots are really the only ones that I have tried that seems to indicate any sort of corelation between any of the variables and the quality and it is very weak. The quality is only slightly squewed towards higher alcohol and lower density or lower acidity.
 
 Lets see if a linear model can make any predictions.
 
 ```{r echo=FALSE, warning=FALSE, Building_the_Linear_Model}
-m1 <- lm(I(quality) ~ I(alcohol), data = wqw)
+m1 <- lm(quality ~ alcohol, data = wqw)
 m2 <- update(m1, ~ . + density)
 m3 <- update(m2, ~ . + residual.sugar)
 m4 <- update(m3, ~ . + chlorides)
 m5 <- update(m4, ~ . + sulphates)
 m6 <- update(m5, ~ . + pH)
-m7 <- update(m6, ~ . + fixed.acidity)
-m8 <- update(m7, ~ . + volatile.acidity)
-m9 <- update(m8, ~ . + citric.acid)
-m10 <- update(m9, ~ . + free.sulfur.dioxide)
-m11 <- update(m10, ~ . + total.sulfur.dioxide)
-mtable(m1, m2, m5, m6, m9, m11, sdigits = 3)
+m7 <- update(m6, ~ . + fixed.acidity + volatile.acidity)
+m8 <- update(m7, ~ . + citric.acid)
+m9 <- update(m8, ~ . + free.sulfur.dioxide)
+m10 <- update(m9, ~ . + total.sulfur.dioxide)
+mtable(m1, m2, m5, m7, m9, m10, sdigits = 3)
 ```
 
-As we can see even when taking into account every feature the R-squared is still only 0.282 which is dismal at best and indicates that we can not make any predictions based on the data that we have.
+```{r echo=FALSE, warning=FALSE, Plotting_Residuals}
+par(mfrow=c(2,2))
+plot(m10)
+par(mfrow=c(1,1))
+```
 
-(I had to remove some of the intermediary steps to make it fit on the page.)
+Looking at the residuals plots there appears to be one outlier that could be effecting the output of the model so I am going to remove that datapoint and re-run the model.
+
+```{r echo=FALSE, warning=FALSE, Building_the_Linear_Model_2}
+wqw.new = wqw[-2782,]
+m1 <- lm(quality ~ alcohol, data = wqw.new)
+m2 <- update(m1, ~ . + density)
+m3 <- update(m2, ~ . + residual.sugar)
+m4 <- update(m3, ~ . + chlorides)
+m5 <- update(m4, ~ . + sulphates)
+m6 <- update(m5, ~ . + pH)
+m7 <- update(m6, ~ . + fixed.acidity + volatile.acidity)
+m8 <- update(m7, ~ . + citric.acid)
+m9 <- update(m8, ~ . + free.sulfur.dioxide)
+m10 <- update(m9, ~ . + total.sulfur.dioxide)
+mtable(m1, m2, m5, m7, m9, m10, sdigits = 3)
+```
+
+```{r echo=FALSE, warning=FALSE, Plotting_Residuals_2}
+par(mfrow=c(2,2))
+plot(m10)
+par(mfrow=c(1,1))
+```
+
+We got a very slight increase to the model but not very much and it looks like we got rid of all the major outliers.
+
+As we can see even when taking into account every feature and removing the outlier the R-squared is still only 0.285 which is dismal at best and indicates that we can not make any predictions based on the data that we have.
+
+(I had to remove some of the intermediary steps to make the model fit on the page.)
 
 # Multivariate Analysis
 
@@ -439,8 +506,10 @@ I did create a basic model and it was not able to predict anything. The main lim
 # Final Plots and Summary
 
 ### Plot One
-```{r echo=FALSE, Plot_One}
-ggpairs(wqw, upper = list(continuous = wrap("cor", size = 1.8)), lower = list(continuous = wrap("smooth", alpha=0.2, color = "orange"))) +
+```{r echo=FALSE, warning=FALSE, fig.width=10, fig.height=10, Plot_One}
+ggpairs(wqw, upper = list(continuous = wrap("cor", size = 3)),
+        lower = list(continuous = wrap("smooth", alpha=0.2,
+                                       color = "orange"))) +
   theme_grey(base_size = 6) +
   ggtitle("Scatterplot Matrix") +
   theme(plot.title = element_text(size=22, hjust = 0.5))
@@ -452,34 +521,28 @@ This is a good summary of the data that we have and it shows how there is no dir
 
 ### Plot Two
 ```{r echo=FALSE, warning=FALSE, Plot_Two}
-ggplot(aes(x = quality, y = alcohol), data = wqw) +
-  geom_point(alpha=0.1, position = position_jitter(h = 0), color = "blue") +
-  geom_line(stat = 'summary', fun.y = mean, color = "blue") +
-  geom_line(stat = 'summary', fun.y = median, color = "black") +
-  geom_line(stat = 'summary', fun.y = quantile, fun.args = list(probs = 0.1), color = 'red', linetype = 2) +
-  geom_line(stat = 'summary', fun.y = quantile, fun.args = list(probs = 0.9), color = 'red', linetype = 2) +
-  ggtitle("Alcohol vs Quality") +
-  xlab("Quality") +
-  ylab("Alcohol") +
+ggplot(aes(x = alcohol, y = fixed.acidity + volatile.acidity), data = wqw) +
+  geom_point(aes(color = factor(quality))) +
+  scale_color_brewer(palette = "RdYlGn") +
+  theme_dark() +
+  labs(x = "Alcohol (%)", y = "Total Acidity (g/dm^3)", title = "Acidity vs Alcohol by Quality", color = "Quality") +
   theme(plot.title = element_text(size=22, hjust = 0.5))
 ```
 
 ### Description Two
 
-Alcohol content is the closest that any of the features came to corelating with the quality and here you can see that even that corelation is very weak. The only thing we can tell is that more higher quality wines had a higher alcohol content than lower quality, but the spread on the data makes this a very weak corelation at 0.436.
+The only distiction I was able to discover was based on alcohol content and it is very slight at best. It does appear that a higher alcohol content increases the chance of a higher quality product but there is no clear distinction that can be seen. While the high quality products mostly have a higher alcohol content and low quality products have lower alcohol content the mid range products span the whole spectrum. Based on this it would be hard to determine the difference between a 6, 7, 8, or 9 quality based on the data provided. But you could probably tell the difference between a 4 and an 8.
 
 ### Plot Three
 ```{r echo=FALSE, warning=FALSE, Plot_Three}
-ggplot(aes(x = density, y = alcohol), data = wqw) +
-  geom_point(aes(color = quality)) +
-  xlim(0.985, 1.005) +
-  labs(x = "Density", y = "Alcohol", title = "Alcohol vs Density by Quality", color = "Quality") +
-  theme(plot.title = element_text(size=22, hjust = 0.5))
+par(mfrow=c(2,2))
+plot(m10)
+par(mfrow=c(1,1))
 ```
 
 ### Description Three
 
-I include this plot just to show how there is no clear distinction in the quality when compared to the features of the data. This is representative of all of the plots I made in the multivariate section.
+After some research it appears that the pattern shown in the Residuals vs. Fitted plot is most likely due to the fact that our dependent variable has only a few possible values. The patterns in the Scale-Location could indicate that a linear model is not the best for our data.
 
 ------
 
