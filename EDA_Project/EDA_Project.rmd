@@ -1,7 +1,7 @@
 ---
 title: "EDA_Project"
 author: "Dusty P"
-date: "May 31, 2018"
+date: "July 19, 2018"
 output: html_document
 ---
 
@@ -207,12 +207,6 @@ I either log transformed or removed the outliers on most of the datapoints to be
 
 # Bivariate Plots Section
 
-> **Tip**: Based on what you saw in the univariate plots, what relationships
-between variables might be interesting to look at in this section? Don't limit
-yourself to relationships between a main output feature and one of the
-supporting variables. Try to look at relationships between supporting variables
-as well.
-
 ```{r echo=FALSE, warning=FALSE, Bivariate_Plots}
 ggpairs(wqw, upper = list(continuous = wrap("cor", size = 1.8)), lower = list(continuous = wrap("smooth", alpha=0.2, color = "orange"))) +
   theme_grey(base_size = 6)
@@ -234,7 +228,7 @@ ggplot(aes(x = residual.sugar, y = density), data = wqw) +
   geom_point(alpha=0.3, color = "orange") +
   xlim(0, 30) +
   ylim(0.987, 1.0025) +
-  geom_smooth()
+  geom_smooth(method = "gam")
 ```
 
 We can see a general trend as residual sugar increases the density also increases. Lets see both of these plotted against our output variable.
@@ -335,21 +329,18 @@ ggplot(aes(x = pH, y = alcohol), data = wqw) +
 
 ```{r echo=FALSE, warning=FALSE, alcohol_vs_fixed_acidity}
 ggplot(aes(x = fixed.acidity, y = alcohol), data = wqw) +
-  geom_point(alpha=0.1, color = "blue") +
+  geom_point(alpha=0.1, color = "blue")
 ```
 
 ```{r echo=FALSE, warning=FALSE, alcohol_vs_volatile_acidity}
 ggplot(aes(x = volatile.acidity, y = alcohol), data = wqw) +
-  geom_point(alpha=0.1, color = "blue") +
+  geom_point(alpha=0.1, color = "blue")
 ```
 
 There does not seem to be any correlation between our other features of interest.
 
 
 # Bivariate Analysis
-
-> **Tip**: As before, summarize what you found in your bivariate explorations
-here. Use the questions below to guide your discussion.
 
 ### Talk about some of the relationships you observed in this part of the investigation. How did the feature(s) of interest vary with other features in the dataset?
 
@@ -366,13 +357,6 @@ One relationship that I found interesting is between alcohol and chlorides as we
 By far the strongest relationship I found was between density and residual sugar.
 
 # Multivariate Plots Section
-
-> **Tip**: Now it's time to put everything together. Based on what you found in
-the bivariate plots section, create a few multivariate plots to investigate
-more complex interactions between variables. Make sure that the plots that you
-create here are justified by the plots you explored in the previous section. If
-you plan on creating any mathematical models, this is the section where you
-will do that.
 
 ```{r echo=FALSE, warning=FALSE, alcohol_chlorides_quality}
 ggplot(aes(x = alcohol, y = chlorides), data = wqw) +
@@ -454,14 +438,6 @@ I did create a basic model and it was not able to predict anything. The main lim
 
 # Final Plots and Summary
 
-> **Tip**: You've done a lot of exploration and have built up an understanding
-of the structure of and relationships between the variables in your dataset.
-Here, you will select three plots from all of your previous exploration to
-present here as a summary of some of your most interesting findings. Make sure
-that you have refined your selected plots for good titling, axis labels (with
-units), and good aesthetic choices (e.g. color, transparency). After each plot,
-make sure you justify why you chose each plot by describing what it shows.
-
 ### Plot One
 ```{r echo=FALSE, Plot_One}
 ggpairs(wqw, upper = list(continuous = wrap("cor", size = 1.8)), lower = list(continuous = wrap("smooth", alpha=0.2, color = "orange"))) +
@@ -503,16 +479,14 @@ ggplot(aes(x = density, y = alcohol), data = wqw) +
 
 ### Description Three
 
-I include this plot just to show how there is no clear distinction in the quality when compared to the features of the data. This is representative of all of the plots I made in this section.
+I include this plot just to show how there is no clear distinction in the quality when compared to the features of the data. This is representative of all of the plots I made in the multivariate section.
 
 ------
 
 # Reflection
 
-> **Tip**: Here's the final step! Reflect on the exploration you performed and
-the insights you found. What were some of the struggles that you went through?
-What went well? What was surprising? Make sure you include an insight into
-future work that could be done with the dataset.
+The Wine dataset that I used contained information from almost 5,000 wine tastings with their quality rating included. Initially I examined the data to see the shape of each of the features and then started exploring how they interact with each other. Then I compared the features against the quality to see if any of the features could help to predict the quality of the product. Finally I created a linear model to see if there was anything I missed in the data that could create predictions.
 
-> **Tip**: Don't forget to remove this, and the other **Tip** sections before
-saving your final work and knitting the final report!
+In the beginning I thought that the quality would have something to do with the alcohol, density, pH, and acidity. As I examined the data it became more and more clear that there was little to no correlation between any of the features and the quality. I found this suprising and really wanted to find any little thing that would point towards a corelation but nothing showed up. Finally when I created the linear model it was clear that you could not predict the quality of the wine from the data that we have in this dataset. We do see some small corelation between the alcohol content and the quality, it appears that the higher the alcohol content the more likely the wine will have a higher quality but there is definately not enough destinction to make any predictions.
+
+I don't know if more datapoints could make a difference but it seems at this point that the quality of wine is subjective and is difficult if not impossible to predict. I might be able to improve the models with more manipulation of the data but other models that I have seen max out at ~70% accuracy such as PennState's STAT 897D Analysis of Wine Quality Data (https://onlinecourses.science.psu.edu/stat857/node/223/), and R-bloggers Predicting wine quality using Random Forests (https://www.r-bloggers.com/predicting-wine-quality-using-random-forests/) which use a lot more complex modeling than a basic linear model. R-bloggers use a random forest and acheived a 71.5% accuracy which is still very low for making predictions. They also had to modify the quality variable into groups where 3, 4, and 5 were considered low quality, 6 and 7 were medium, and 8 and 9 were high quality. I personally find this unacceptable as it degrades the quality of the output and artifically pushes the prediction rate higher. On a scale of 1-10 the difference between 8 and 9 can be quite substantial.
